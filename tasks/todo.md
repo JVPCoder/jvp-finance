@@ -24,9 +24,10 @@ Função pura `calcularRemuneracao({bruto, proLabore, dependentes, quotas})` + `
 
 ## T3: Criar primeiro mês **[UI]**
 Remover boilerplate do CRA (logo, reportWebVitals). Tela vazia → "Criar mês" com formulário (mês, dias úteis, valor hora, horas/dia=8, pró-labore, dependentes, quotas, %s 50/20/30 que devem somar 100; PL entre 1518 e 8157,41). Ao salvar, abre o mês mostrando a quebra do simulador e o orçamento de cada pote. `meses.js`: `novoMes(params)`, `orcamentos(mes)`.
-- [ ] Formulário valida (%s ≠ 100, PL fora da faixa, campos vazios) com mensagens acessíveis
-- [ ] Quebra do líquido em BRL e orçamentos por pote exibidos
-- [ ] Recarregar a página mantém o mês
+- [x] Formulário valida (%s ≠ 100, PL fora da faixa, campos vazios) com mensagens acessíveis
+- [x] Quebra do líquido em BRL e orçamentos por pote exibidos
+- [x] Recarregar a página mantém o mês
+- [x] Sidebar + dashboard (pedido do João); paleta revisada com `design-taste-frontend`
 - Verificar: testes + `npm start` manual
 - Depende de: T1, T2
 - Arquivos: `src/App.js`, `src/App.css`, `src/meses.js`, `src/meses.test.js`, `src/index.js` · Tamanho: M

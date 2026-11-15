@@ -23,7 +23,7 @@ Dor que resolve: recriar o mês à mão (duplicar aba, recopiar fixos, avançar 
    - O mês é editável depois (dá para apagar/editar herdados).
 3. **Lançamentos** — Em cada pote: Origem, Data, Método (Pix/Crédito/Débito/Dinheiro), Categoria (texto livre com sugestões dos valores já usados), Valor, tipo (avulso/fixo/parcelado + `n/N`).
    Por pote: total gasto e saldo (orçamento − total). Saldo negativo em destaque.
-4. **Navegação** — Lista de meses (mais recente primeiro); abrir, editar parâmetros (recalcula), excluir mês (com confirmação).
+4. **Navegação** — Layout com sidebar (Dashboard, Novo mês, Meses, Backup; vira barra no topo em tela estreita) e **dashboard** com as principais informações do mês mais recente (líquido, quebra, potes, gamificação). Página Meses: lista (mais recente primeiro); abrir, editar parâmetros (recalcula), excluir mês (com confirmação). Páginas são `useState`, sem roteador.
 5. **Gamificação**
    - **Streak**: meses consecutivos (do mais recente para trás) em que Desejos ≤ orçamento **e** Investimentos ≥ orçamento. Mês corrente aparece como "em andamento" se ainda não bateu.
    - **Dívida do cartão**: soma das parcelas restantes de lançamentos parcelados com Método = Crédito, no mês mais recente: Σ (N − n) × valor. Barra = pago / (pago + restante), com "faltam X parcelas · R$ Y".
