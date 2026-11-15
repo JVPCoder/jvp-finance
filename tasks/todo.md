@@ -13,9 +13,9 @@ Função pura `calcularRemuneracao({bruto, proLabore, dependentes, quotas})` + `
 
 ## T2: Storage
 `carregar()`, `salvar(dados)` (chave `jvp-finance:v1`), `exportar(dados)` (string JSON), `importar(texto)` (valida `version` e `meses`; lança erro se inválido).
-- [ ] Ida e volta exportar → importar devolve dados idênticos
-- [ ] JSON inválido/estrutura errada → erro, sem efeito colateral
-- [ ] `carregar()` sem nada salvo ou com localStorage indisponível → `{version:1, meses:{}}`
+- [x] Ida e volta exportar → importar devolve dados idênticos
+- [x] JSON inválido/estrutura errada → erro, sem efeito colateral
+- [x] `carregar()` sem nada salvo ou com localStorage indisponível → `{version:1, meses:{}}`
 - Verificar: `npm test -- --watchAll=false`
 - Depende de: —
 - Arquivos: `src/storage.js`, `src/storage.test.js` · Tamanho: S
