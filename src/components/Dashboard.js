@@ -1,8 +1,14 @@
-import { POTES, resumoMes } from '../meses';
+import { POTES, resumoMes, totaisPorPote } from '../meses';
 import { brl, nomeMes } from '../formato';
 import Quebra from './Quebra';
+import Lancamentos from './Lancamentos';
 
-export default function Dashboard({ chave, mes, onNovoMes }) {
+function textoSaldo(poteId, saldo) {
+  if (poteId === 'investimentos') return saldo > 0 ? `Faltam ${brl(saldo)} para a meta` : 'Meta batida';
+  return saldo >= 0 ? `Restam ${brl(saldo)}` : `Passou ${brl(-saldo)}`;
+}
+
+export default function Dashboard({ chave, mes, categorias, onNovoMes, onSalvarLancamento, onRemoverLancamento }) {
   if (!mes) {
     return (
       <section className="vazio">
@@ -14,6 +20,7 @@ export default function Dashboard({ chave, mes, onNovoMes }) {
   }
 
   const r = resumoMes(mes);
+  const totais = totaisPorPote(mes);
   const { params } = mes;
 
   return (
@@ -36,16 +43,37 @@ export default function Dashboard({ chave, mes, onNovoMes }) {
         <section className="painel" aria-labelledby="potes-titulo">
           <h2 id="potes-titulo">Potes</h2>
           <ul className="potes">
-            {POTES.map((p) => (
-              <li key={p.id} className={`pote pote-${p.id}`}>
-                <span className="pote-nome">{p.nome}</span>
-                <span className="pote-pct">{params.pct[p.id]}%</span>
-                <span className="pote-valor num">{brl(r.orcamentos[p.id])}</span>
-              </li>
-            ))}
+            {POTES.map((p) => {
+              const t = totais[p.id];
+              const pct = t.orcamento > 0 ? Math.min((t.gasto / t.orcamento) * 100, 100) : 0;
+              const estourou = p.id !== 'investimentos' && t.saldo < 0;
+              return (
+                <li key={p.id} className={`pote pote-${p.id}${estourou ? ' estourou' : ''}`}>
+                  <div className="pote-cabecalho">
+                    <span className="pote-nome">{p.nome}</span>
+                    <span className="pote-pct">{params.pct[p.id]}%</span>
+                  </div>
+                  <p className="pote-uso num">
+                    {brl(t.gasto)} <span>de {brl(t.orcamento)}</span>
+                  </p>
+                  <div className="barra" aria-hidden="true">
+                    <span style={{ width: `${pct}%` }} />
+                  </div>
+                  <p className="pote-saldo num">{textoSaldo(p.id, t.saldo)}</p>
+                </li>
+              );
+            })}
           </ul>
         </section>
       </div>
+
+      <Lancamentos
+        chave={chave}
+        lancamentos={mes.lancamentos}
+        categorias={categorias}
+        onSalvar={onSalvarLancamento}
+        onRemover={onRemoverLancamento}
+      />
     </>
   );
 }

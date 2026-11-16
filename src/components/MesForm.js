@@ -3,6 +3,7 @@ import { TABELA } from '../simulador';
 import { POTES, resumoMes } from '../meses';
 import { brl, nomeMes } from '../formato';
 import Quebra from './Quebra';
+import Campo from './Campo';
 
 const PADRAO = { diasUteis: '', valorHora: '', horasDia: '8', proLabore: '', dependentes: '0', quotas: '0',
                  essenciais: '50', desejos: '20', investimentos: '30' };
@@ -31,17 +32,6 @@ function validar(v, chavesExistentes) {
   const soma = POTES.reduce((s, p) => s + (Number(v[p.id]) || 0), 0);
   if (Math.abs(soma - 100) > 0.001) e.pct = `Os percentuais somam ${soma}%. Precisam somar 100%.`;
   return e;
-}
-
-function Campo({ id, label, erro, dica, ...input }) {
-  const descricao = erro ? `${id}-erro` : dica ? `${id}-dica` : undefined;
-  return (
-    <div className="campo">
-      <label htmlFor={id}>{label}</label>
-      <input id={id} name={id} aria-invalid={erro ? true : undefined} aria-describedby={descricao} {...input} />
-      {erro ? <small id={`${id}-erro`} className="erro">{erro}</small> : dica && <small id={`${id}-dica`}>{dica}</small>}
-    </div>
-  );
 }
 
 export default function MesForm({ chaveInicial, inicial, chavesExistentes, onSalvar, onCancelar }) {

@@ -1,6 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import App from './App';
+import { CHAVE } from './storage';
 
 beforeEach(() => localStorage.clear());
 
@@ -31,6 +32,52 @@ test('criar o primeiro mês mostra o líquido no dashboard e persiste', () => {
   unmount();
   render(<App />);
   expect(screen.getByRole('heading', { level: 1, name: /dezembro de 2026/i })).toBeInTheDocument();
+});
+
+function comMes() {
+  localStorage.setItem(CHAVE, JSON.stringify({
+    version: 1,
+    meses: { '2026-12': { params: { diasUteis: 20, valorHora: 40, horasDia: 8, proLabore: 1621, dependentes: 0, quotas: 0,
+                                    pct: { essenciais: 50, desejos: 20, investimentos: 30 } }, lancamentos: [] } },
+  }));
+  render(<App />);
+}
+
+function lancar(origem, valor) {
+  userEvent.click(screen.getByRole('button', { name: /novo lançamento/i }));
+  preencher(/origem/i, origem);
+  preencher(/^valor/i, valor);
+  userEvent.click(screen.getByRole('button', { name: /salvar lançamento/i }));
+}
+
+test('lançar, editar e excluir atualizam o saldo do pote', () => {
+  comMes();
+  expect(screen.getByText('Restam R$ 2.893,90')).toBeInTheDocument();
+
+  lancar('Academia', '150');
+  expect(screen.getByRole('cell', { name: /academia/i })).toBeInTheDocument();
+  expect(screen.getByText('Restam R$ 2.743,90')).toBeInTheDocument();
+
+  userEvent.click(screen.getByRole('button', { name: /editar academia/i }));
+  preencher(/^valor/i, '200');
+  userEvent.click(screen.getByRole('button', { name: /salvar lançamento/i }));
+  expect(screen.getByText('Restam R$ 2.693,90')).toBeInTheDocument();
+
+  userEvent.click(screen.getByRole('button', { name: /excluir academia/i }));
+  expect(screen.queryByRole('cell', { name: /academia/i })).not.toBeInTheDocument();
+  expect(screen.getByText('Restam R$ 2.893,90')).toBeInTheDocument();
+});
+
+test('parcelado com parcela maior que o total é rejeitado', () => {
+  comMes();
+  userEvent.click(screen.getByRole('button', { name: /novo lançamento/i }));
+  preencher(/origem/i, 'Quest 3');
+  preencher(/^valor/i, '353.34');
+  userEvent.selectOptions(screen.getByLabelText(/tipo/i), 'parcelado');
+  preencher(/parcela atual/i, '5');
+  preencher(/total de parcelas/i, '3');
+  userEvent.click(screen.getByRole('button', { name: /salvar lançamento/i }));
+  expect(screen.getByText(/não pode passar do total/i)).toBeInTheDocument();
 });
 
 test('percentuais que não somam 100 bloqueiam o envio', () => {

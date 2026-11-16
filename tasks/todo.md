@@ -34,9 +34,9 @@ Remover boilerplate do CRA (logo, reportWebVitals). Tela vazia → "Criar mês" 
 
 ## T4: Lançamentos por pote **[UI]**
 Em cada pote: adicionar/editar/apagar lançamento (Origem, Data, Método, Categoria com `<datalist>` dos já usados, Valor, tipo avulso/fixo/parcelado + n/N). Total e saldo por pote; saldo negativo destacado. `meses.js`: `totaisPorPote(mes)`.
-- [ ] CRUD de lançamento funciona e persiste
-- [ ] Total e saldo corretos (teste unitário de `totaisPorPote`)
-- [ ] Parcelado exige n ≤ N
+- [x] CRUD de lançamento funciona e persiste
+- [x] Total e saldo corretos (teste unitário de `totaisPorPote`)
+- [x] Parcelado exige n ≤ N
 - Verificar: testes + manual
 - Depende de: T3
 - Arquivos: `src/App.js`, `src/App.css`, `src/meses.js`, `src/meses.test.js` (+ `src/components/Pote.js` se App.js crescer) · Tamanho: M

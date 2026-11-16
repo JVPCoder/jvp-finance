@@ -1,4 +1,4 @@
-import { novoMes, resumoMes, ultimoMes, proximaChave } from './meses';
+import { novoMes, resumoMes, ultimoMes, proximaChave, totaisPorPote, salvarLancamento, removerLancamento, categoriasUsadas } from './meses';
 
 const params = { diasUteis: 20, valorHora: 40, horasDia: 8, proLabore: 1621, dependentes: 0, quotas: 0,
                  pct: { essenciais: 50, desejos: 20, investimentos: 30 } };
@@ -24,4 +24,36 @@ test('ultimoMes pega a maior chave', () => {
 test('proximaChave vira o ano', () => {
   expect(proximaChave('2026-11')).toBe('2026-12');
   expect(proximaChave('2026-12')).toBe('2027-01');
+});
+
+const l = (id, pote, valor, categoria = '') => ({ id, pote, valor, categoria, origem: id, data: '2026-12-01', metodo: 'Pix', tipo: 'avulso' });
+
+test('totaisPorPote soma gastos e calcula saldo', () => {
+  const mes = { params, lancamentos: [l('a', 'desejos', 100), l('b', 'desejos', 57.56), l('c', 'essenciais', 3000)] };
+  const t = totaisPorPote(mes);
+  expect(t.desejos.gasto).toBeCloseTo(157.56, 2);
+  expect(t.desejos.saldo).toBeCloseTo(1000, 2);
+  expect(t.essenciais.saldo).toBeCloseTo(-106.1, 2);
+  expect(t.investimentos.gasto).toBe(0);
+});
+
+test('salvarLancamento insere novo e substitui existente pelo id', () => {
+  let mes = novoMes(params);
+  mes = salvarLancamento(mes, l('a', 'desejos', 10));
+  mes = salvarLancamento(mes, l('b', 'desejos', 20));
+  mes = salvarLancamento(mes, { ...l('a', 'desejos', 99) });
+  expect(mes.lancamentos.map((x) => [x.id, x.valor])).toEqual([['a', 99], ['b', 20]]);
+});
+
+test('removerLancamento tira só o id pedido', () => {
+  const mes = { params, lancamentos: [l('a', 'desejos', 10), l('b', 'desejos', 20)] };
+  expect(removerLancamento(mes, 'a').lancamentos.map((x) => x.id)).toEqual(['b']);
+});
+
+test('categoriasUsadas junta categorias únicas de todos os meses', () => {
+  const meses = {
+    '2026-11': { params, lancamentos: [l('a', 'desejos', 1, 'Games'), l('b', 'desejos', 1, '')] },
+    '2026-12': { params, lancamentos: [l('c', 'essenciais', 1, 'Contas'), l('d', 'desejos', 1, 'Games')] },
+  };
+  expect(categoriasUsadas(meses)).toEqual(['Contas', 'Games']);
 });

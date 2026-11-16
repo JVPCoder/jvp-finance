@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import './App.css';
 import { carregar, salvar } from './storage';
-import { novoMes, proximaChave, ultimoMes } from './meses';
+import { categoriasUsadas, novoMes, proximaChave, removerLancamento, salvarLancamento, ultimoMes } from './meses';
 import { chaveHoje } from './formato';
 import Sidebar from './components/Sidebar';
 import Dashboard from './components/Dashboard';
@@ -28,6 +28,8 @@ export default function App() {
     setPagina('dashboard');
   }
 
+  const atualizarMes = (chave, fn) => setDados((d) => ({ ...d, meses: { ...d.meses, [chave]: fn(d.meses[chave]) } }));
+
   return (
     <div className="app">
       <Sidebar pagina={pagina} onNavegar={setPagina} />
@@ -50,7 +52,14 @@ export default function App() {
             />
           </>
         ) : (
-          <Dashboard chave={chaveAtual} mes={dados.meses[chaveAtual]} onNovoMes={() => setPagina('novo-mes')} />
+          <Dashboard
+            chave={chaveAtual}
+            mes={dados.meses[chaveAtual]}
+            categorias={categoriasUsadas(dados.meses)}
+            onNovoMes={() => setPagina('novo-mes')}
+            onSalvarLancamento={(l) => atualizarMes(chaveAtual, (m) => salvarLancamento(m, l))}
+            onRemoverLancamento={(id) => atualizarMes(chaveAtual, (m) => removerLancamento(m, id))}
+          />
         )}
       </main>
     </div>
