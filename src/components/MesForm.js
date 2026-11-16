@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { TABELA } from '../simulador';
-import { POTES, resumoMes } from '../meses';
+import { POTES, herdarLancamentos, mesAnterior, resumoMes } from '../meses';
 import { brl, nomeMes } from '../formato';
 import Quebra from './Quebra';
 import Campo from './Campo';
@@ -34,8 +34,29 @@ function validar(v, chavesExistentes) {
   return e;
 }
 
-export default function MesForm({ chaveInicial, inicial, chavesExistentes, onSalvar, onCancelar }) {
-  const [v, setV] = useState({ ...PADRAO, ...inicial, chave: chaveInicial });
+// parâmetros do mês base viram valores do formulário; dias úteis sempre em branco
+function paraForm(p) {
+  if (!p) return {};
+  const s = (x) => String(x);
+  return { valorHora: s(p.valorHora), horasDia: s(p.horasDia), proLabore: s(p.proLabore), dependentes: s(p.dependentes),
+           quotas: s(p.quotas), essenciais: s(p.pct.essenciais), desejos: s(p.pct.desejos), investimentos: s(p.pct.investimentos) };
+}
+
+const plural = (n, um, varios) => `${n} ${n === 1 ? um : varios}`;
+
+function textoHeranca(meses, chave) {
+  const anterior = mesAnterior(meses, chave);
+  if (!anterior) return null;
+  const herdados = herdarLancamentos(meses[anterior]);
+  if (herdados.length === 0) return `Nada a herdar de ${nomeMes(anterior)}.`;
+  const fixos = herdados.filter((l) => l.tipo === 'fixo').length;
+  return `Herda ${plural(fixos, 'fixo', 'fixos')} e ${plural(herdados.length - fixos, 'parcela', 'parcelas')} de ${nomeMes(anterior)}.`;
+}
+
+export default function MesForm({ chaveInicial, paramsBase, meses, onSalvar, onCancelar }) {
+  const chavesExistentes = Object.keys(meses);
+  const [v, setV] = useState({ ...PADRAO, ...paraForm(paramsBase), chave: chaveInicial });
+  const heranca = /^\d{4}-\d{2}$/.test(v.chave) && !chavesExistentes.includes(v.chave) ? textoHeranca(meses, v.chave) : null;
   const [erros, setErros] = useState({});
   const mudar = (e) => setV({ ...v, [e.target.name]: e.target.value });
   const num = (id, label, extra) => <Campo key={id} id={id} label={label} type="number" inputMode="decimal" value={v[id]} onChange={mudar} erro={erros[id]} {...extra} />;
@@ -82,6 +103,7 @@ export default function MesForm({ chaveInicial, inicial, chavesExistentes, onSal
           {erros.pct && <p id="pct-erro" className="erro" role="alert">{erros.pct}</p>}
         </fieldset>
 
+        {heranca && <p className="heranca">{heranca}</p>}
         <div className="acoes">
           <button type="submit" className="btn primario">Criar mês</button>
           {onCancelar && <button type="button" className="btn" onClick={onCancelar}>Cancelar</button>}

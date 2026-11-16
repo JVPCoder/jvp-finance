@@ -1,7 +1,8 @@
-import { CalendarPlusIcon, ChartPieSliceIcon } from '@phosphor-icons/react';
+import { CalendarDotsIcon, CalendarPlusIcon, ChartPieSliceIcon } from '@phosphor-icons/react';
 
 const ITENS = [
   { id: 'dashboard', rotulo: 'Dashboard', Icone: ChartPieSliceIcon },
+  { id: 'meses', rotulo: 'Meses', Icone: CalendarDotsIcon },
   { id: 'novo-mes', rotulo: 'Novo mês', Icone: CalendarPlusIcon },
 ];
 

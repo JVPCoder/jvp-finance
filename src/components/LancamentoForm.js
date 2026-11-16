@@ -1,8 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
-import { METODOS, POTES } from '../meses';
+import { METODOS, POTES, novoId } from '../meses';
 import Campo from './Campo';
-
-const novoId = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
 
 function dataPadrao(chave) {
   const hoje = new Date();

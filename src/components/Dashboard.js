@@ -8,7 +8,7 @@ function textoSaldo(poteId, saldo) {
   return saldo >= 0 ? `Restam ${brl(saldo)}` : `Passou ${brl(-saldo)}`;
 }
 
-export default function Dashboard({ chave, mes, categorias, onNovoMes, onSalvarLancamento, onRemoverLancamento }) {
+export default function Dashboard({ chave, ehAtual, mes, categorias, onNovoMes, onSalvarLancamento, onRemoverLancamento }) {
   if (!mes) {
     return (
       <section className="vazio">
@@ -26,7 +26,7 @@ export default function Dashboard({ chave, mes, categorias, onNovoMes, onSalvarL
   return (
     <>
       <header className="pagina-topo">
-        <p className="sobretitulo">Mês atual</p>
+        <p className="sobretitulo">{ehAtual ? 'Mês atual' : 'Mês anterior'}</p>
         <h1>{nomeMes(chave)}</h1>
       </header>
 
@@ -68,6 +68,7 @@ export default function Dashboard({ chave, mes, categorias, onNovoMes, onSalvarL
       </div>
 
       <Lancamentos
+        key={chave}
         chave={chave}
         lancamentos={mes.lancamentos}
         categorias={categorias}

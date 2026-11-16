@@ -183,6 +183,12 @@ h2 { font-size: 1rem; font-weight: 600; }
 .btn-icone:hover { background: var(--superficie-2); color: var(--texto); }
 .btn-icone.perigo:hover { color: var(--negativo); }
 
+.tabela .negativo { color: var(--negativo); }
+.link { font: inherit; font-weight: 600; color: var(--texto); background: none; border: 0; padding: 0; cursor: pointer; text-decoration: underline; text-decoration-color: var(--borda); text-underline-offset: 3px; }
+.link:hover { text-decoration-color: var(--destaque); }
+.pagina-topo.secao-topo { margin-bottom: 1.5rem; }
+.heranca { margin: 0; padding: 0.625rem 0.875rem; border-radius: var(--raio); background: var(--superficie-2); font-size: 0.875rem; }
+
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
 
 /* Estado vazio */

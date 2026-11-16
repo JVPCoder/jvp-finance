@@ -6,7 +6,31 @@ export const POTES = [
   { id: 'investimentos', nome: 'Investimentos' },
 ];
 
-export const novoMes = (params) => ({ params, lancamentos: [] });
+export const novoMes = (params, lancamentos = []) => ({ params, lancamentos });
+
+export const novoId = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+
+const dois = (n) => String(n).padStart(2, '0');
+
+// mesmo dia no mês seguinte; 31/jan vira o último dia de fevereiro
+function maisUmMes(iso) {
+  const [ano, mes, dia] = iso.split('-').map(Number);
+  const [novoAno, novoMes] = mes === 12 ? [ano + 1, 1] : [ano, mes + 1];
+  const ultimoDia = new Date(novoAno, novoMes, 0).getDate();
+  return `${novoAno}-${dois(novoMes)}-${dois(Math.min(dia, ultimoDia))}`;
+}
+
+const herdavel = (l) => l.tipo === 'fixo' || (l.tipo === 'parcelado' && l.parcela.n < l.parcela.total);
+
+export const herdarLancamentos = (anterior) =>
+  anterior.lancamentos.filter(herdavel).map((l) => ({
+    ...l,
+    id: novoId(),
+    data: maisUmMes(l.data),
+    ...(l.tipo === 'parcelado' && { parcela: { ...l.parcela, n: l.parcela.n + 1 } }),
+  }));
+
+export const mesAnterior = (meses, chave) => Object.keys(meses).filter((k) => k < chave).sort().pop();
 
 export function resumoMes({ params }) {
   const bruto = calcularBruto(params);

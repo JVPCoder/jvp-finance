@@ -1,4 +1,4 @@
-import { novoMes, resumoMes, ultimoMes, proximaChave, totaisPorPote, salvarLancamento, removerLancamento, categoriasUsadas } from './meses';
+import { novoMes, resumoMes, ultimoMes, proximaChave, totaisPorPote, salvarLancamento, removerLancamento, categoriasUsadas, herdarLancamentos, mesAnterior } from './meses';
 
 const params = { diasUteis: 20, valorHora: 40, horasDia: 8, proLabore: 1621, dependentes: 0, quotas: 0,
                  pct: { essenciais: 50, desejos: 20, investimentos: 30 } };
@@ -56,4 +56,35 @@ test('categoriasUsadas junta categorias únicas de todos os meses', () => {
     '2026-12': { params, lancamentos: [l('c', 'essenciais', 1, 'Contas'), l('d', 'desejos', 1, 'Games')] },
   };
   expect(categoriasUsadas(meses)).toEqual(['Contas', 'Games']);
+});
+
+test('herdarLancamentos: fixo copia, parcela avança, última parcela e avulso somem', () => {
+  const anterior = {
+    params,
+    lancamentos: [
+      { ...l('academia', 'essenciais', 150), tipo: 'fixo', data: '2026-11-15' },
+      { ...l('quest', 'desejos', 353.34), tipo: 'parcelado', parcela: { n: 9, total: 10 }, data: '2026-11-06' },
+      { ...l('tv', 'desejos', 200), tipo: 'parcelado', parcela: { n: 10, total: 10 }, data: '2026-11-06' },
+      { ...l('ifood', 'desejos', 49), tipo: 'avulso', data: '2026-11-18' },
+    ],
+  };
+  const herdados = herdarLancamentos(anterior);
+  expect(herdados.map((x) => [x.origem, x.data, x.parcela?.n])).toEqual([
+    ['academia', '2026-12-15', undefined],
+    ['quest', '2026-12-06', 10],
+  ]);
+  expect(herdados.map((x) => x.id)).not.toContain('academia');
+  expect(new Set(herdados.map((x) => x.id)).size).toBe(2);
+  expect(anterior.lancamentos[1].parcela.n).toBe(9); // não muta o anterior
+});
+
+test('herdarLancamentos: dia 31 vira o último dia do mês seguinte', () => {
+  const anterior = { params, lancamentos: [{ ...l('aluguel', 'essenciais', 1505), tipo: 'fixo', data: '2026-01-31' }] };
+  expect(herdarLancamentos(anterior)[0].data).toBe('2026-02-28');
+});
+
+test('mesAnterior pega o mês mais recente antes da chave', () => {
+  const meses = { '2026-09': {}, '2026-11': {}, '2027-01': {} };
+  expect(mesAnterior(meses, '2026-12')).toBe('2026-11');
+  expect(mesAnterior(meses, '2026-09')).toBeUndefined();
 });

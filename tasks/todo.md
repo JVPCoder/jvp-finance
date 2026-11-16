@@ -45,8 +45,8 @@ Em cada pote: adicionar/editar/apagar lançamento (Origem, Data, Método, Catego
 
 ## T5: Lista de meses + mês seguinte com herança **[UI]**
 Lista de meses (recente primeiro) com líquido e saldo total; abrir mês. "Criar próximo mês": `herdarLancamentos(anterior)` — fixo copia (data +1 mês), parcelado n<N vira n+1, n=N some; params pré-preenchidos do anterior exceto dias úteis.
-- [ ] Testes de herança: fixo, parcela avança, parcela final some, data 31/jan → fim de fev
-- [ ] Mês seguinte criado só preenchendo dias úteis
+- [x] Testes de herança: fixo, parcela avança, parcela final some, data 31/jan → fim de fev
+- [x] Mês seguinte criado só preenchendo dias úteis
 - Verificar: testes + manual
 - Depende de: T4
 - Arquivos: `src/meses.js`, `src/meses.test.js`, `src/App.js`, `src/App.css` · Tamanho: M

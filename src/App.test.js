@@ -80,6 +80,55 @@ test('parcelado com parcela maior que o total é rejeitado', () => {
   expect(screen.getByText(/não pode passar do total/i)).toBeInTheDocument();
 });
 
+test('criar o próximo mês herda fixos e parcelas e pré-preenche os parâmetros', () => {
+  const base = { id: 'x', data: '2026-11-10', metodo: 'Crédito', categoria: '' };
+  localStorage.setItem(CHAVE, JSON.stringify({
+    version: 1,
+    meses: { '2026-11': {
+      params: { diasUteis: 20, valorHora: 40, horasDia: 8, proLabore: 1621, dependentes: 0, quotas: 0,
+                pct: { essenciais: 50, desejos: 20, investimentos: 30 } },
+      lancamentos: [
+        { ...base, id: 'a', pote: 'essenciais', origem: 'Academia', valor: 150, tipo: 'fixo' },
+        { ...base, id: 'b', pote: 'desejos', origem: 'Quest 3', valor: 353.34, tipo: 'parcelado', parcela: { n: 9, total: 10 } },
+        { ...base, id: 'c', pote: 'desejos', origem: 'Pizza', valor: 60, tipo: 'avulso' },
+      ],
+    } },
+  }));
+  render(<App />);
+
+  userEvent.click(screen.getByRole('button', { name: /novo mês/i }));
+  expect(screen.getByLabelText(/^mês$/i)).toHaveValue('2026-12');
+  expect(screen.getByLabelText(/dias úteis/i)).toHaveValue(null);
+  expect(screen.getByLabelText(/valor da hora/i)).toHaveValue(40);
+  expect(screen.getByText(/herda 1 fixo e 1 parcela de novembro de 2026/i)).toBeInTheDocument();
+
+  preencher(/dias úteis/i, '22');
+  userEvent.click(screen.getByRole('button', { name: /criar mês/i }));
+
+  expect(screen.getByRole('heading', { level: 1, name: /dezembro de 2026/i })).toBeInTheDocument();
+  expect(screen.getByRole('cell', { name: /academia/i })).toBeInTheDocument();
+  expect(screen.getByRole('cell', { name: /quest 3.*10\/10/i })).toBeInTheDocument();
+  expect(screen.queryByRole('cell', { name: /pizza/i })).not.toBeInTheDocument();
+});
+
+test('página Meses lista os meses e abre um anterior', () => {
+  const params = { diasUteis: 20, valorHora: 40, horasDia: 8, proLabore: 1621, dependentes: 0, quotas: 0,
+                   pct: { essenciais: 50, desejos: 20, investimentos: 30 } };
+  localStorage.setItem(CHAVE, JSON.stringify({
+    version: 1,
+    meses: { '2026-11': { params, lancamentos: [] }, '2026-12': { params: { ...params, diasUteis: 22 }, lancamentos: [] } },
+  }));
+  render(<App />);
+
+  userEvent.click(screen.getByRole('button', { name: /^meses$/i }));
+  const linhas = screen.getAllByRole('row').slice(1);
+  expect(linhas[0]).toHaveTextContent(/dezembro de 2026/i);
+  expect(linhas[1]).toHaveTextContent(/novembro de 2026/i);
+
+  userEvent.click(screen.getByRole('button', { name: /novembro de 2026/i }));
+  expect(screen.getByRole('heading', { level: 1, name: /novembro de 2026/i })).toBeInTheDocument();
+});
+
 test('percentuais que não somam 100 bloqueiam o envio', () => {
   render(<App />);
   userEvent.click(screen.getByRole('button', { name: /criar primeiro mês/i }));
