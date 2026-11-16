@@ -23,33 +23,33 @@ meses.js ──────┘                                                  
 ## Lista de tarefas
 
 ### Fase 1: Fundação
-- [ ] T1: Simulador (cálculo + testes de referência)
-- [ ] T2: Storage (localStorage + exportar/importar JSON + testes)
+- [x] T1: Simulador (cálculo + testes de referência)
+- [x] T2: Storage (localStorage + exportar/importar JSON + testes)
 
 ### Checkpoint 1
-- [ ] `npm test -- --watchAll=false` verde; 5 casos do simulador batem
+- [x] `npm test -- --watchAll=false` verde; 5 casos do simulador batem
 
 ### Fase 2: Fluxo principal
-- [ ] T3: Criar primeiro mês e ver quebra do líquido + orçamentos (UI)
-- [ ] T4: Lançamentos por pote com total e saldo (UI)
+- [x] T3: Criar primeiro mês e ver quebra do líquido + orçamentos (UI)
+- [x] T4: Lançamentos por pote com total e saldo (UI)
 
 ### Checkpoint 2
-- [ ] Criar mês → lançar gasto → saldo atualiza → recarregar mantém. Revisão com o João.
+- [x] Criar mês → lançar gasto → saldo atualiza → recarregar mantém. Revisão com o João.
 
 ### Fase 3: Fim da dor (recriar mês)
-- [ ] T5: Lista de meses + criar mês seguinte com herança
-- [ ] T6: Editar parâmetros e excluir mês
+- [x] T5: Lista de meses + criar mês seguinte com herança
+- [x] T6: Editar parâmetros e excluir mês
 
 ### Checkpoint 3
-- [ ] Mês seguinte nasce com fixos e parcelas avançadas; só digito dias úteis
+- [x] Mês seguinte nasce com fixos e parcelas avançadas; só digito dias úteis
 
 ### Fase 4: Motivação e segurança
-- [ ] T7: Gamificação (streak + barra da dívida)
-- [ ] T8: Backup UI (exportar/importar)
-- [ ] T9: Teste de fumaça + passe final de acessibilidade/responsividade
+- [x] T7: Gamificação (streak + barra da dívida)
+- [x] T8: Backup UI (exportar/importar)
+- [x] T9: Teste de fumaça + passe final de acessibilidade/responsividade
 
 ### Checkpoint final
-- [ ] Todos os critérios de sucesso da `SPEC.md`; `npm run build` passa
+- [x] Todos os critérios de sucesso da `SPEC.md`; `npm run build` passa
 
 ## Riscos e mitigações
 | Risco | Impacto | Mitigação |

@@ -136,12 +136,12 @@ Jest + Testing Library (já vêm no CRA).
 
 ## Critérios de sucesso
 
-- [ ] Os 5 casos de referência batem (±R$ 0,01).
-- [ ] Criar o mês seguinte herda fixos e avança parcelas sem digitação extra; só preencho dias úteis (e ajusto o que mudou).
-- [ ] Saldos dos 3 potes atualizam ao lançar/editar/apagar.
-- [ ] Streak e barra de dívida refletem as regras acima.
-- [ ] Recarregar a página mantém tudo; exportar/importar restaura idêntico.
-- [ ] `npm test -- --watchAll=false` e `npm run build` passam.
+- [x] Os 5 casos de referência batem (±R$ 0,01).
+- [x] Criar o mês seguinte herda fixos e avança parcelas sem digitação extra; só preencho dias úteis (e ajusto o que mudou).
+- [x] Saldos dos 3 potes atualizam ao lançar/editar/apagar.
+- [x] Streak e barra de dívida refletem as regras acima.
+- [x] Recarregar a página mantém tudo; exportar/importar restaura idêntico.
+- [x] `npm test -- --watchAll=false` e `npm run build` passam.
 
 ## Decisões (2026-11-15)
 

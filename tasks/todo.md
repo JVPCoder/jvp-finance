@@ -79,8 +79,8 @@ Botão exportar (download `jvp-finance-AAAA-MM-DD.json` via Blob) e importar (`<
 
 ## T9: Teste de fumaça + passe final **[UI]**
 `App.test.js`: cria mês, lança gasto, saldo atualiza. Revisar acessibilidade (labels, foco, contraste, teclado) e layout em janela estreita.
-- [ ] Teste de fumaça verde
-- [ ] `npm run build` sem warnings de lint
+- [x] Teste de fumaça verde
+- [x] `npm run build` sem warnings de lint
 - Depende de: T1–T8
 - Arquivos: `src/App.test.js`, `src/App.css` · Tamanho: S
 

@@ -54,7 +54,7 @@ h2 { font-size: 1rem; font-weight: 600; }
 
 /* Layout */
 .app { display: grid; grid-template-columns: 220px 1fr; min-height: 100dvh; }
-.conteudo { padding: 2rem 2.5rem; max-width: 1100px; width: 100%; }
+.conteudo { padding: 2rem 2.5rem; max-width: 1100px; width: 100%; min-width: 0; }
 
 .sidebar {
   background: var(--superficie-2);
@@ -147,7 +147,7 @@ h2 { font-size: 1rem; font-weight: 600; }
 
 /* Lançamentos */
 .lancamentos { margin-top: 2rem; }
-.secao-topo { display: flex; justify-content: space-between; align-items: center; gap: 1rem; margin-bottom: 1rem; }
+.secao-topo { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 1rem; margin-bottom: 1rem; }
 .secao-topo h2 { font-size: 1.125rem; }
 .lancamento-form { display: grid; gap: 0.75rem; margin-bottom: 1.25rem; }
 .lancamento-form h3 { margin: 0; font-size: 1rem; font-weight: 600; }
@@ -272,16 +272,21 @@ legend { font-weight: 600; padding: 0 0.25rem; }
 
 /* Telas estreitas: sidebar vira barra no topo */
 @media (max-width: 860px) {
-  .app { grid-template-columns: 1fr; }
-  .sidebar { position: static; height: auto; display: flex; align-items: center; gap: 1rem; padding: 0.75rem 1rem; border-right: 0; border-bottom: 1px solid var(--borda); }
+  .app { grid-template-columns: minmax(0, 1fr); }
+  .sidebar { position: static; height: auto; display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 1rem; padding: 0.75rem 1rem; border-right: 0; border-bottom: 1px solid var(--borda); }
   .marca { margin: 0; }
-  .sidebar ul { display: flex; }
+  .sidebar ul { display: flex; flex-wrap: wrap; }
+  .nav-item { padding: 0.4375rem 0.625rem; }
   .nav-item[aria-current='page'] { box-shadow: inset 0 -2px 0 var(--destaque); }
   .conteudo { padding: 1.25rem 1rem; }
   .dashboard-grid, .mes-form-layout, .gamificacao, .backup-grid { grid-template-columns: 1fr; }
-  .sidebar ul { flex-wrap: wrap; }
+
   .previa { position: static; }
   .campo.largo { grid-column: auto; }
+}
+
+@media (max-width: 480px) {
+  .marca { width: 100%; }
 }
 
 @media (prefers-reduced-motion: reduce) {
