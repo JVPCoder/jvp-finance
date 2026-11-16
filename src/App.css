@@ -65,7 +65,8 @@ h2 { font-size: 1rem; font-weight: 600; }
   top: 0;
   height: 100dvh;
 }
-.marca { font-weight: 700; margin: 0 0.75rem 1.5rem; letter-spacing: -0.01em; }
+.marca { display: flex; align-items: center; gap: 0.5rem; font-weight: 700; margin: 0 0.75rem 1.5rem; letter-spacing: -0.01em; }
+.marca img { flex-shrink: 0; }
 .sidebar ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.25rem; }
 .nav-item {
   display: flex;
