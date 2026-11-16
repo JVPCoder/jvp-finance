@@ -1,70 +1,64 @@
-# Getting Started with Create React App
+# JVP Finance
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+App web pessoal para planejar a renda e controlar os gastos mês a mês. Substitui duas planilhas: um simulador de remuneração de cooperativa (renda por hora) e uma planilha de gastos dividida em potes.
 
-## Available Scripts
+Roda no navegador do PC, sem login e sem servidor. Os dados ficam no `localStorage`, com backup em JSON.
 
-In the project directory, you can run:
+## O que faz
 
-### `npm start`
+- **Previsão da renda:** ao criar o mês, você informa dias úteis, horas por dia e valor da hora. O app calcula o bruto e chega ao líquido descontando INSS, IRRF, taxa administrativa e quotas.
+- **Potes:** o líquido é dividido em Essenciais, Desejos e Investimentos, com percentuais definidos a cada mês.
+- **Lançamentos:** cada gasto entra num pote (origem, data, método, categoria e valor), e cada pote mostra quanto foi gasto e quanto ainda resta.
+- **Mês seguinte sem retrabalho:** o mês novo já nasce com os lançamentos fixos e as parcelas do anterior, com as parcelas avançadas (3/10 → 4/10). Os parâmetros vêm preenchidos e só os dias úteis ficam em branco.
+- **Gamificação:**
+  - **Sequência:** conta os meses seguidos em que os Desejos ficaram dentro do orçamento e a meta de investimento foi batida.
+  - **Dívida do cartão:** barra de progresso das parcelas no crédito.
+- **Backup:** exporta e importa todos os dados em `.json`. O arquivo é validado antes de importar e a importação pede confirmação.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+## Como rodar
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+Requer Node.js 18 ou superior.
 
-### `npm test`
+```bash
+npm install
+npm start                        # abre em http://localhost:3000
+npm test -- --watchAll=false     # roda os testes uma vez
+npm run build                    # gera a versão de produção em build/
+```
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## Cálculo da remuneração
 
-### `npm run build`
+As regras ficam no objeto `TABELA`, em `src/simulador.js`. Quando alíquotas ou faixas mudarem, é só atualizar ali.
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+| Item | Regra |
+|---|---|
+| Bruto | dias úteis × horas por dia × valor da hora |
+| Antecipação de sobras | bruto − pró-labore (isenta) |
+| INSS | 20% do pró-labore, com teto de R$ 1.631,48 |
+| IRRF | tabela progressiva mensal sobre pró-labore − INSS − dependentes |
+| Redutor IRRF 2026 | pró-labore até R$ 5.000 não paga; entre R$ 5.000 e R$ 7.350 desconta 978,62 − 0,133145 × pró-labore (Lei 15.270/2025) |
+| Taxa adm | 4,5% do bruto |
+| Líquido | bruto − (INSS + IRRF + taxa adm + quotas) |
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## Estrutura
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+```
+src/
+  simulador.js        cálculo bruto → líquido (funções puras)
+  meses.js            potes, herança de lançamentos, sequência e dívida (funções puras)
+  storage.js          localStorage e backup JSON com validação
+  formato.js          moeda (BRL) e nome do mês
+  App.js              estado e navegação entre páginas
+  components/         Dashboard, Meses, MesForm, Lancamentos, Gamificacao, Backup...
+  *.test.js           testes ao lado do código
+```
 
-### `npm run eject`
+As regras de negócio ficam em funções puras, testadas sem React. Os componentes só chamam essas funções e mostram o resultado.
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+## Stack
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+React 19 com Create React App, CSS puro com modo escuro automático, ícones [Phosphor](https://phosphoricons.com/) e testes com Jest e Testing Library.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+## Dados e privacidade
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+Nada sai do navegador. Limpar os dados do site apaga tudo, então exporte um backup de vez em quando pela página **Backup**.
