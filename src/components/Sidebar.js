@@ -1,6 +1,8 @@
+import { CalendarPlusIcon, ChartPieSliceIcon } from '@phosphor-icons/react';
+
 const ITENS = [
-  { id: 'dashboard', rotulo: 'Dashboard' },
-  { id: 'novo-mes', rotulo: 'Novo mês' },
+  { id: 'dashboard', rotulo: 'Dashboard', Icone: ChartPieSliceIcon },
+  { id: 'novo-mes', rotulo: 'Novo mês', Icone: CalendarPlusIcon },
 ];
 
 export default function Sidebar({ pagina, onNavegar }) {
@@ -8,18 +10,22 @@ export default function Sidebar({ pagina, onNavegar }) {
     <nav className="sidebar" aria-label="Principal">
       <p className="marca">JVP Finance</p>
       <ul>
-        {ITENS.map((item) => (
-          <li key={item.id}>
-            <button
-              type="button"
-              className="nav-item"
-              aria-current={pagina === item.id ? 'page' : undefined}
-              onClick={() => onNavegar(item.id)}
-            >
-              {item.rotulo}
-            </button>
-          </li>
-        ))}
+        {ITENS.map(({ id, rotulo, Icone }) => {
+          const ativo = pagina === id;
+          return (
+            <li key={id}>
+              <button
+                type="button"
+                className="nav-item"
+                aria-current={ativo ? 'page' : undefined}
+                onClick={() => onNavegar(id)}
+              >
+                <Icone size={18} weight={ativo ? 'fill' : 'regular'} aria-hidden="true" />
+                {rotulo}
+              </button>
+            </li>
+          );
+        })}
       </ul>
     </nav>
   );

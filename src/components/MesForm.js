@@ -48,7 +48,7 @@ export default function MesForm({ chaveInicial, inicial, chavesExistentes, onSal
   const [v, setV] = useState({ ...PADRAO, ...inicial, chave: chaveInicial });
   const [erros, setErros] = useState({});
   const mudar = (e) => setV({ ...v, [e.target.name]: e.target.value });
-  const num = (id, label, extra) => <Campo id={id} label={label} type="number" inputMode="decimal" value={v[id]} onChange={mudar} erro={erros[id]} {...extra} />;
+  const num = (id, label, extra) => <Campo key={id} id={id} label={label} type="number" inputMode="decimal" value={v[id]} onChange={mudar} erro={erros[id]} {...extra} />;
 
   const params = paraParams(v);
   const previa = Object.keys(validar(v, [])).length === 0 ? resumoMes({ params }) : null;
@@ -87,7 +87,7 @@ export default function MesForm({ chaveInicial, inicial, chavesExistentes, onSal
         <fieldset aria-describedby={erros.pct ? 'pct-erro' : undefined}>
           <legend>Divisão do líquido (%)</legend>
           <div className="linha-campos">
-            {POTES.map((p) => num(p.id, p.nome, { key: p.id, step: 1, min: 0, max: 100, 'aria-invalid': erros.pct ? true : undefined }))}
+            {POTES.map((p) => num(p.id, p.nome, { step: 1, min: 0, max: 100, 'aria-invalid': erros.pct ? true : undefined }))}
           </div>
           {erros.pct && <p id="pct-erro" className="erro" role="alert">{erros.pct}</p>}
         </fieldset>

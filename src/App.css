@@ -67,6 +67,9 @@ h2 { font-size: 1rem; font-weight: 600; }
 .marca { font-weight: 700; margin: 0 0.75rem 1.5rem; letter-spacing: -0.01em; }
 .sidebar ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.25rem; }
 .nav-item {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
   width: 100%;
   text-align: left;
   font: inherit;
@@ -79,6 +82,8 @@ h2 { font-size: 1rem; font-weight: 600; }
 }
 .nav-item:hover { background: var(--borda); color: var(--texto); }
 .nav-item[aria-current='page'] { background: var(--superficie); color: var(--texto); font-weight: 600; box-shadow: inset 3px 0 0 var(--destaque); }
+.nav-item svg { flex-shrink: 0; }
+.nav-item[aria-current='page'] svg { color: var(--destaque); }
 
 .pagina-topo { margin-bottom: 1.5rem; }
 .sobretitulo { margin: 0 0 0.25rem; font-size: 0.8125rem; color: var(--texto-2); }
