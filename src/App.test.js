@@ -129,6 +129,33 @@ test('página Meses lista os meses e abre um anterior', () => {
   expect(screen.getByRole('heading', { level: 1, name: /novembro de 2026/i })).toBeInTheDocument();
 });
 
+test('editar parâmetros recalcula o líquido e mantém os lançamentos', () => {
+  comMes();
+  lancar('Academia', '150');
+  userEvent.click(screen.getByRole('button', { name: /editar mês/i }));
+  expect(screen.getByLabelText(/^mês$/i)).toBeDisabled();
+  expect(screen.getByLabelText(/dias úteis/i)).toHaveValue(20);
+
+  preencher(/dias úteis/i, '22');
+  userEvent.click(screen.getByRole('button', { name: /salvar mês/i }));
+
+  expect(screen.getAllByText('R$ 6.399,00').length).toBeGreaterThan(0);
+  expect(screen.getByRole('cell', { name: /academia/i })).toBeInTheDocument();
+});
+
+test('excluir mês pede confirmação', () => {
+  comMes();
+  const confirmar = jest.spyOn(window, 'confirm').mockReturnValueOnce(false).mockReturnValueOnce(true);
+
+  userEvent.click(screen.getByRole('button', { name: /excluir mês/i }));
+  expect(screen.getByRole('heading', { level: 1, name: /dezembro de 2026/i })).toBeInTheDocument();
+
+  userEvent.click(screen.getByRole('button', { name: /excluir mês/i }));
+  expect(screen.getByRole('heading', { name: /nenhum mês ainda/i })).toBeInTheDocument();
+  expect(confirmar).toHaveBeenCalledTimes(2);
+  confirmar.mockRestore();
+});
+
 test('percentuais que não somam 100 bloqueiam o envio', () => {
   render(<App />);
   userEvent.click(screen.getByRole('button', { name: /criar primeiro mês/i }));

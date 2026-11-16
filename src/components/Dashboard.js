@@ -1,3 +1,4 @@
+import { PencilSimpleIcon, TrashIcon } from '@phosphor-icons/react';
 import { POTES, resumoMes, totaisPorPote } from '../meses';
 import { brl, nomeMes } from '../formato';
 import Quebra from './Quebra';
@@ -8,7 +9,9 @@ function textoSaldo(poteId, saldo) {
   return saldo >= 0 ? `Restam ${brl(saldo)}` : `Passou ${brl(-saldo)}`;
 }
 
-export default function Dashboard({ chave, ehAtual, mes, categorias, onNovoMes, onSalvarLancamento, onRemoverLancamento }) {
+export default function Dashboard({
+  chave, ehAtual, mes, categorias, onNovoMes, onEditarMes, onExcluirMes, onSalvarLancamento, onRemoverLancamento,
+}) {
   if (!mes) {
     return (
       <section className="vazio">
@@ -25,9 +28,21 @@ export default function Dashboard({ chave, ehAtual, mes, categorias, onNovoMes, 
 
   return (
     <>
-      <header className="pagina-topo">
-        <p className="sobretitulo">{ehAtual ? 'Mês atual' : 'Mês anterior'}</p>
-        <h1>{nomeMes(chave)}</h1>
+      <header className="pagina-topo secao-topo">
+        <div>
+          <p className="sobretitulo">{ehAtual ? 'Mês atual' : 'Mês anterior'}</p>
+          <h1>{nomeMes(chave)}</h1>
+        </div>
+        <div className="acoes">
+          <button type="button" className="btn" onClick={onEditarMes}>
+            <PencilSimpleIcon size={16} aria-hidden="true" />
+            Editar mês
+          </button>
+          <button type="button" className="btn perigo" onClick={onExcluirMes}>
+            <TrashIcon size={16} aria-hidden="true" />
+            Excluir mês
+          </button>
+        </div>
       </header>
 
       <div className="dashboard-grid">

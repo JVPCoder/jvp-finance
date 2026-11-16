@@ -53,8 +53,8 @@ Lista de meses (recente primeiro) com líquido e saldo total; abrir mês. "Criar
 
 ## T6: Editar parâmetros e excluir mês **[UI]**
 Reabrir o formulário do mês com valores atuais (recalcula tudo); excluir mês com confirmação.
-- [ ] Editar dias úteis muda líquido e orçamentos na hora
-- [ ] Excluir pede confirmação e remove do storage
+- [x] Editar dias úteis muda líquido e orçamentos na hora
+- [x] Excluir pede confirmação e remove do storage
 - Verificar: manual
 - Depende de: T5
 - Arquivos: `src/App.js` · Tamanho: S

@@ -34,11 +34,11 @@ function validar(v, chavesExistentes) {
   return e;
 }
 
-// parâmetros do mês base viram valores do formulário; dias úteis sempre em branco
-function paraForm(p) {
+// parâmetros viram valores do formulário; dias úteis só ao editar (mês novo sempre pergunta)
+function paraForm(p, comDias) {
   if (!p) return {};
   const s = (x) => String(x);
-  return { valorHora: s(p.valorHora), horasDia: s(p.horasDia), proLabore: s(p.proLabore), dependentes: s(p.dependentes),
+  return { ...(comDias && { diasUteis: s(p.diasUteis) }), valorHora: s(p.valorHora), horasDia: s(p.horasDia), proLabore: s(p.proLabore), dependentes: s(p.dependentes),
            quotas: s(p.quotas), essenciais: s(p.pct.essenciais), desejos: s(p.pct.desejos), investimentos: s(p.pct.investimentos) };
 }
 
@@ -53,10 +53,11 @@ function textoHeranca(meses, chave) {
   return `Herda ${plural(fixos, 'fixo', 'fixos')} e ${plural(herdados.length - fixos, 'parcela', 'parcelas')} de ${nomeMes(anterior)}.`;
 }
 
-export default function MesForm({ chaveInicial, paramsBase, meses, onSalvar, onCancelar }) {
-  const chavesExistentes = Object.keys(meses);
-  const [v, setV] = useState({ ...PADRAO, ...paraForm(paramsBase), chave: chaveInicial });
-  const heranca = /^\d{4}-\d{2}$/.test(v.chave) && !chavesExistentes.includes(v.chave) ? textoHeranca(meses, v.chave) : null;
+export default function MesForm({ chaveInicial, paramsBase, meses, editando = false, onSalvar, onCancelar }) {
+  const chavesExistentes = editando ? [] : Object.keys(meses);
+  const [v, setV] = useState({ ...PADRAO, ...paraForm(paramsBase, editando), chave: chaveInicial });
+  const heranca = !editando && /^\d{4}-\d{2}$/.test(v.chave) && !chavesExistentes.includes(v.chave)
+    ? textoHeranca(meses, v.chave) : null;
   const [erros, setErros] = useState({});
   const mudar = (e) => setV({ ...v, [e.target.name]: e.target.value });
   const num = (id, label, extra) => <Campo key={id} id={id} label={label} type="number" inputMode="decimal" value={v[id]} onChange={mudar} erro={erros[id]} {...extra} />;
@@ -78,7 +79,7 @@ export default function MesForm({ chaveInicial, paramsBase, meses, onSalvar, onC
       <form className="mes-form" onSubmit={enviar} noValidate>
         <fieldset>
           <legend>Renda</legend>
-          <Campo id="chave" label="Mês" type="month" value={v.chave} onChange={mudar} erro={erros.chave} />
+          <Campo id="chave" label="Mês" type="month" value={v.chave} onChange={mudar} erro={erros.chave} disabled={editando} />
           <div className="linha-campos">
             {num('diasUteis', 'Dias úteis', { step: 1, min: 1, max: 31, inputMode: 'numeric' })}
             {num('horasDia', 'Horas por dia', { step: 0.5, min: 1, max: 24 })}
@@ -105,7 +106,7 @@ export default function MesForm({ chaveInicial, paramsBase, meses, onSalvar, onC
 
         {heranca && <p className="heranca">{heranca}</p>}
         <div className="acoes">
-          <button type="submit" className="btn primario">Criar mês</button>
+          <button type="submit" className="btn primario">{editando ? 'Salvar mês' : 'Criar mês'}</button>
           {onCancelar && <button type="button" className="btn" onClick={onCancelar}>Cancelar</button>}
         </div>
       </form>

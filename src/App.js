@@ -4,7 +4,7 @@ import { carregar, salvar } from './storage';
 import {
   categoriasUsadas, herdarLancamentos, mesAnterior, novoMes, proximaChave, removerLancamento, salvarLancamento, ultimoMes,
 } from './meses';
-import { chaveHoje } from './formato';
+import { chaveHoje, nomeMes } from './formato';
 import Sidebar from './components/Sidebar';
 import Dashboard from './components/Dashboard';
 import MesForm from './components/MesForm';
@@ -49,8 +49,40 @@ export default function App() {
 
   const atualizarMes = (chave, fn) => setDados((d) => ({ ...d, meses: { ...d.meses, [chave]: fn(d.meses[chave]) } }));
 
+  function salvarParams(chave, params) {
+    atualizarMes(chave, (m) => ({ ...m, params }));
+    setPagina('dashboard');
+  }
+
+  function excluirMes(chave) {
+    const n = dados.meses[chave].lancamentos.length;
+    const aviso = n ? ` Os ${n} lançamentos dele também serão apagados.` : '';
+    if (!window.confirm(`Excluir ${nomeMes(chave)}?${aviso}`)) return;
+    setDados((d) => {
+      const { [chave]: _removido, ...resto } = d.meses;
+      return { ...d, meses: resto };
+    });
+    setSelecionado(null);
+  }
+
   let conteudo;
-  if (pagina === 'novo-mes') {
+  if (pagina === 'editar-mes' && chaveVista) {
+    conteudo = (
+      <>
+        <header className="pagina-topo">
+          <h1>Editar {nomeMes(chaveVista)}</h1>
+        </header>
+        <MesForm
+          editando
+          chaveInicial={chaveVista}
+          paramsBase={dados.meses[chaveVista].params}
+          meses={dados.meses}
+          onSalvar={salvarParams}
+          onCancelar={() => setPagina('dashboard')}
+        />
+      </>
+    );
+  } else if (pagina === 'novo-mes') {
     conteudo = (
       <>
         <header className="pagina-topo">
@@ -75,6 +107,8 @@ export default function App() {
         mes={dados.meses[chaveVista]}
         categorias={categoriasUsadas(dados.meses)}
         onNovoMes={() => navegar('novo-mes')}
+        onEditarMes={() => setPagina('editar-mes')}
+        onExcluirMes={() => excluirMes(chaveVista)}
         onSalvarLancamento={(l) => atualizarMes(chaveVista, (m) => salvarLancamento(m, l))}
         onRemoverLancamento={(id) => atualizarMes(chaveVista, (m) => removerLancamento(m, id))}
       />
