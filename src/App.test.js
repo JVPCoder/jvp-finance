@@ -156,6 +156,13 @@ test('excluir mês pede confirmação', () => {
   confirmar.mockRestore();
 });
 
+test('dashboard mostra sequência em andamento e dívida do cartão', () => {
+  comMes();
+  expect(screen.getByText('0 meses')).toBeInTheDocument();
+  expect(screen.getByText(/faltam r\$ 1\.736,34 investidos para dezembro de 2026 contar/i)).toBeInTheDocument();
+  expect(screen.getByText(/sem parcelas no cartão/i)).toBeInTheDocument();
+});
+
 test('percentuais que não somam 100 bloqueiam o envio', () => {
   render(<App />);
   userEvent.click(screen.getByRole('button', { name: /criar primeiro mês/i }));

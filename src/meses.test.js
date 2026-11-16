@@ -1,4 +1,4 @@
-import { novoMes, resumoMes, ultimoMes, proximaChave, totaisPorPote, salvarLancamento, removerLancamento, categoriasUsadas, herdarLancamentos, mesAnterior } from './meses';
+import { novoMes, resumoMes, ultimoMes, proximaChave, totaisPorPote, salvarLancamento, removerLancamento, categoriasUsadas, herdarLancamentos, mesAnterior, streak, dividaCartao } from './meses';
 
 const params = { diasUteis: 20, valorHora: 40, horasDia: 8, proLabore: 1621, dependentes: 0, quotas: 0,
                  pct: { essenciais: 50, desejos: 20, investimentos: 30 } };
@@ -87,4 +87,41 @@ test('mesAnterior pega o mês mais recente antes da chave', () => {
   const meses = { '2026-09': {}, '2026-11': {}, '2027-01': {} };
   expect(mesAnterior(meses, '2026-12')).toBe('2026-11');
   expect(mesAnterior(meses, '2026-09')).toBeUndefined();
+});
+
+// orçamentos com params: desejos 1157,56 · investimentos 1736,34
+const mesCom = (desejos, investimentos, extra = []) => ({
+  params,
+  lancamentos: [l('d', 'desejos', desejos), l('i', 'investimentos', investimentos), ...extra],
+});
+const bom = () => mesCom(1000, 1736.34);
+const ruim = () => mesCom(1200, 1736.34);
+
+test('streak conta meses seguidos que bateram as metas', () => {
+  expect(streak({ '2026-09': ruim(), '2026-10': bom(), '2026-11': bom(), '2026-12': bom() }))
+    .toEqual({ meses: 3, emAndamento: false });
+});
+
+test('streak: mês mais recente sem meta fica em andamento e não quebra', () => {
+  expect(streak({ '2026-10': bom(), '2026-11': bom(), '2026-12': mesCom(100, 0) }))
+    .toEqual({ meses: 2, emAndamento: true });
+});
+
+test('streak: investimento abaixo da meta ou mês faltando quebra a sequência', () => {
+  expect(streak({ '2026-10': bom(), '2026-11': mesCom(100, 1000), '2026-12': bom() }).meses).toBe(1);
+  expect(streak({ '2026-09': bom(), '2026-11': bom(), '2026-12': bom() }).meses).toBe(2);
+  expect(streak({})).toEqual({ meses: 0, emAndamento: false });
+});
+
+test('dividaCartao soma parcelas restantes no crédito do mês mais recente', () => {
+  const parc = (id, valor, n, total, metodo = 'Crédito') => ({ ...l(id, 'desejos', valor), tipo: 'parcelado', metodo, parcela: { n, total } });
+  const meses = {
+    '2026-11': mesCom(0, 0, [parc('velha', 999, 1, 2)]),
+    '2026-12': mesCom(0, 0, [parc('quest', 353.34, 3, 10), parc('tv', 200, 4, 4), parc('pix', 100, 1, 5, 'Pix')]),
+  };
+  const d = dividaCartao(meses);
+  expect(d.parcelasRestantes).toBe(7);
+  expect(d.restante).toBeCloseTo(2473.38, 2);
+  expect(d.pago).toBeCloseTo(353.34 * 3 + 800, 2);
+  expect(dividaCartao({ '2026-12': mesCom(0, 0) })).toBeNull();
 });

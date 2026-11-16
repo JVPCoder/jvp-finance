@@ -3,6 +3,7 @@ import { POTES, resumoMes, totaisPorPote } from '../meses';
 import { brl, nomeMes } from '../formato';
 import Quebra from './Quebra';
 import Lancamentos from './Lancamentos';
+import Gamificacao from './Gamificacao';
 
 function textoSaldo(poteId, saldo) {
   if (poteId === 'investimentos') return saldo > 0 ? `Faltam ${brl(saldo)} para a meta` : 'Meta batida';
@@ -10,7 +11,7 @@ function textoSaldo(poteId, saldo) {
 }
 
 export default function Dashboard({
-  chave, ehAtual, mes, categorias, onNovoMes, onEditarMes, onExcluirMes, onSalvarLancamento, onRemoverLancamento,
+  chave, ehAtual, mes, meses, categorias, onNovoMes, onEditarMes, onExcluirMes, onSalvarLancamento, onRemoverLancamento,
 }) {
   if (!mes) {
     return (
@@ -44,6 +45,8 @@ export default function Dashboard({
           </button>
         </div>
       </header>
+
+      <Gamificacao meses={meses} />
 
       <div className="dashboard-grid">
         <section className="painel" aria-labelledby="renda-titulo">

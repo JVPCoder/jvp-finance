@@ -128,6 +128,15 @@ h2 { font-size: 1rem; font-weight: 600; }
 .pote.estourou .barra span { background: var(--negativo); }
 .pote.estourou .pote-saldo { color: var(--negativo); font-weight: 600; }
 
+/* Gamificação */
+.gamificacao { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.25rem; margin-bottom: 1.25rem; }
+.conquista { --cor-pote: var(--destaque); padding: 1rem 1.5rem; }
+.conquista-topo { display: flex; align-items: center; gap: 0.5rem; color: var(--texto-2); }
+.conquista-topo h2 { margin: 0; font-size: 0.875rem; font-weight: 500; color: var(--texto-2); }
+.conquista.ativa .conquista-topo svg { color: var(--destaque); }
+.conquista-valor { font-size: 1.5rem; font-weight: 650; margin: 0.25rem 0 0.375rem; letter-spacing: -0.01em; }
+.conquista-texto { margin: 0.375rem 0 0; font-size: 0.875rem; color: var(--texto-2); }
+
 /* Lançamentos */
 .lancamentos { margin-top: 2rem; }
 .secao-topo { display: flex; justify-content: space-between; align-items: center; gap: 1rem; margin-bottom: 1rem; }
@@ -261,7 +270,7 @@ legend { font-weight: 600; padding: 0 0.25rem; }
   .sidebar ul { display: flex; }
   .nav-item[aria-current='page'] { box-shadow: inset 0 -2px 0 var(--destaque); }
   .conteudo { padding: 1.25rem 1rem; }
-  .dashboard-grid, .mes-form-layout { grid-template-columns: 1fr; }
+  .dashboard-grid, .mes-form-layout, .gamificacao { grid-template-columns: 1fr; }
   .previa { position: static; }
   .campo.largo { grid-column: auto; }
 }

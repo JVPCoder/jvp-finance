@@ -69,3 +69,39 @@ export const removerLancamento = (mes, id) => ({ ...mes, lancamentos: mes.lancam
 
 export const categoriasUsadas = (meses) =>
   [...new Set(Object.values(meses).flatMap((m) => m.lancamentos.map((l) => l.categoria)).filter(Boolean))].sort();
+
+const CENTAVO = 0.005;
+
+export function bateuMetas(mes) {
+  const t = totaisPorPote(mes);
+  return t.desejos.saldo >= -CENTAVO && t.investimentos.saldo <= CENTAVO;
+}
+
+// meses seguidos (no calendário) que bateram as metas; o mais recente sem meta fica "em andamento"
+export function streak(meses) {
+  const chaves = Object.keys(meses).sort().reverse();
+  if (chaves.length === 0) return { meses: 0, emAndamento: false };
+  const emAndamento = !bateuMetas(meses[chaves[0]]);
+  let contagem = 0;
+  for (let i = emAndamento ? 1 : 0; i < chaves.length; i++) {
+    const seguido = i === 0 || proximaChave(chaves[i]) === chaves[i - 1];
+    if (!seguido || !bateuMetas(meses[chaves[i]])) break;
+    contagem++;
+  }
+  return { meses: contagem, emAndamento };
+}
+
+// parcelas no crédito do mês mais recente; a parcela do mês conta como paga
+export function dividaCartao(meses) {
+  const chave = ultimoMes(meses);
+  const parcelas = chave ? meses[chave].lancamentos.filter((l) => l.tipo === 'parcelado' && l.metodo === 'Crédito') : [];
+  if (parcelas.length === 0) return null;
+  return parcelas.reduce(
+    (d, l) => ({
+      pago: d.pago + l.parcela.n * l.valor,
+      restante: d.restante + (l.parcela.total - l.parcela.n) * l.valor,
+      parcelasRestantes: d.parcelasRestantes + l.parcela.total - l.parcela.n,
+    }),
+    { pago: 0, restante: 0, parcelasRestantes: 0 },
+  );
+}

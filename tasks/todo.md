@@ -63,8 +63,8 @@ Reabrir o formulário do mês com valores atuais (recalcula tudo); excluir mês 
 
 ## T7: Gamificação **[UI]**
 `streak(meses)` e `dividaCartao(meses)` em `meses.js` conforme spec; card com streak (mês atual "em andamento") e barra de progresso da dívida (`<progress>` nativo, "faltam X parcelas · R$ Y").
-- [ ] Testes: streak quebra quando Desejos estoura ou Investimentos não bate; dívida soma (N−n)×valor só de Crédito
-- [ ] Card visível na tela inicial
+- [x] Testes: streak quebra quando Desejos estoura ou Investimentos não bate; dívida soma (N−n)×valor só de Crédito
+- [x] Card visível na tela inicial
 - Verificar: testes + manual
 - Depende de: T5
 - Arquivos: `src/meses.js`, `src/meses.test.js`, `src/App.js`, `src/App.css` · Tamanho: M

@@ -105,6 +105,7 @@ export default function App() {
         chave={chaveVista}
         ehAtual={chaveVista === chaveAtual}
         mes={dados.meses[chaveVista]}
+        meses={dados.meses}
         categorias={categoriasUsadas(dados.meses)}
         onNovoMes={() => navegar('novo-mes')}
         onEditarMes={() => setPagina('editar-mes')}
