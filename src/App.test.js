@@ -163,6 +163,32 @@ test('dashboard mostra sequência em andamento e dívida do cartão', () => {
   expect(screen.getByText(/sem parcelas no cartão/i)).toBeInTheDocument();
 });
 
+const arquivo = (texto) => new File([texto], 'backup.json', { type: 'application/json' });
+
+test('importar backup inválido mostra erro e não mexe nos dados', async () => {
+  comMes();
+  userEvent.click(screen.getByRole('button', { name: /^backup$/i }));
+  userEvent.upload(screen.getByLabelText(/arquivo de backup/i), arquivo('{oops'));
+
+  expect(await screen.findByText(/arquivo de backup inválido/i)).toBeInTheDocument();
+  expect(JSON.parse(localStorage.getItem(CHAVE)).meses['2026-12']).toBeDefined();
+});
+
+test('importar backup válido substitui os dados após confirmação', async () => {
+  comMes();
+  const confirmar = jest.spyOn(window, 'confirm').mockReturnValue(true);
+  const backup = { version: 1, meses: { '2027-03': JSON.parse(localStorage.getItem(CHAVE)).meses['2026-12'] } };
+
+  userEvent.click(screen.getByRole('button', { name: /^backup$/i }));
+  userEvent.upload(screen.getByLabelText(/arquivo de backup/i), arquivo(JSON.stringify(backup)));
+
+  expect(await screen.findByText(/backup importado/i)).toBeInTheDocument();
+  expect(confirmar).toHaveBeenCalled();
+  userEvent.click(screen.getByRole('button', { name: /^dashboard$/i }));
+  expect(screen.getByRole('heading', { level: 1, name: /março de 2027/i })).toBeInTheDocument();
+  confirmar.mockRestore();
+});
+
 test('percentuais que não somam 100 bloqueiam o envio', () => {
   render(<App />);
   userEvent.click(screen.getByRole('button', { name: /criar primeiro mês/i }));

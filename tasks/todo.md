@@ -71,8 +71,8 @@ Reabrir o formulário do mês com valores atuais (recalcula tudo); excluir mês 
 
 ## T8: Backup UI **[UI]**
 Botão exportar (download `jvp-finance-AAAA-MM-DD.json` via Blob) e importar (`<input type="file">` + confirmação; erro amigável se inválido).
-- [ ] Exportar → apagar localStorage → importar restaura tudo
-- [ ] Arquivo inválido mostra erro e não altera dados
+- [x] Exportar → apagar localStorage → importar restaura tudo
+- [x] Arquivo inválido mostra erro e não altera dados
 - Verificar: manual
 - Depende de: T2, T3
 - Arquivos: `src/App.js` · Tamanho: S

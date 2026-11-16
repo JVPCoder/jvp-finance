@@ -9,6 +9,7 @@ import Sidebar from './components/Sidebar';
 import Dashboard from './components/Dashboard';
 import MesForm from './components/MesForm';
 import Meses from './components/Meses';
+import Backup from './components/Backup';
 
 export default function App() {
   const [dados, setDados] = useState(carregar);
@@ -96,6 +97,16 @@ export default function App() {
           onCancelar={chaveAtual ? () => navegar('dashboard') : undefined}
         />
       </>
+    );
+  } else if (pagina === 'backup') {
+    conteudo = (
+      <Backup
+        dados={dados}
+        onImportar={(novos) => {
+          setDados(novos);
+          setSelecionado(null);
+        }}
+      />
     );
   } else if (pagina === 'meses') {
     conteudo = <Meses meses={dados.meses} onAbrir={abrirMes} onNovoMes={() => navegar('novo-mes')} />;
