@@ -13,6 +13,7 @@
   --desejos: #a8476b;
   --investimentos: #047857;
   --raio: 6px;
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1); /* entradas e feedback; nunca ease-in em UI */
   color-scheme: light;
 }
 
@@ -123,7 +124,18 @@ h2 { font-size: 1rem; font-weight: 600; }
 .pote-uso { margin: 0.25rem 0 0.5rem; font-weight: 600; }
 .pote-uso span { color: var(--texto-2); font-weight: 400; }
 .barra { height: 6px; background: var(--superficie-2); border-radius: 3px; overflow: hidden; }
-.barra span { display: block; height: 100%; background: var(--cor-pote); border-radius: 3px; transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+/* Preenchimento via transform (não width): --pct vem inline no próprio span */
+.barra span {
+  display: block;
+  height: 100%;
+  background: var(--cor-pote);
+  border-radius: 3px;
+  transform: translateX(calc(var(--pct, 0) * 1% - 100%));
+  transition: transform 250ms var(--ease-out);
+}
+@starting-style {
+  .barra span { transform: translateX(-100%); } /* enche a partir do zero ao aparecer */
+}
 .pote-saldo { margin: 0.375rem 0 0; font-size: 0.875rem; color: var(--texto-2); }
 .pote.estourou .barra span { background: var(--negativo); }
 .pote.estourou .pote-saldo { color: var(--negativo); font-weight: 600; }
@@ -149,7 +161,15 @@ h2 { font-size: 1rem; font-weight: 600; }
 .lancamentos { margin-top: 2rem; }
 .secao-topo { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 1rem; margin-bottom: 1rem; }
 .secao-topo h2 { font-size: 1.125rem; }
-.lancamento-form { display: grid; gap: 0.75rem; margin-bottom: 1.25rem; }
+.lancamento-form {
+  display: grid;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+  transition: opacity 200ms var(--ease-out), transform 200ms var(--ease-out);
+}
+@starting-style {
+  .lancamento-form { opacity: 0; transform: translateY(-6px); }
+}
 .lancamento-form h3 { margin: 0; font-size: 1rem; font-weight: 600; }
 .campo.largo { grid-column: span 2; }
 
@@ -229,7 +249,6 @@ h2 { font-size: 1rem; font-weight: 600; }
   cursor: pointer;
 }
 .btn:hover { background: var(--superficie-2); }
-.btn:active { transform: translateY(1px); }
 .btn.primario { background: var(--destaque); border-color: var(--destaque); color: var(--destaque-texto); }
 .btn.primario:hover { filter: brightness(1.08); }
 .btn.perigo:hover { color: var(--negativo); border-color: var(--negativo); }
@@ -270,6 +289,30 @@ legend { font-weight: 600; padding: 0 0.25rem; }
 
 .alerta { background: var(--superficie); border: 1px solid var(--negativo); color: var(--negativo); padding: 0.75rem 1rem; border-radius: var(--raio); margin: 0 0 1.25rem; }
 
+/* Movimento
+   Cor no hover: 150ms ease. Pressionar: 120ms scale(0.97). Troca de página: blocos entram com 40ms de intervalo.
+   Linhas da tabela e números não animam: são lidos várias vezes por dia. */
+.btn, .nav-item, .filtro, .btn-icone {
+  transition: background-color 150ms ease, color 150ms ease, border-color 150ms ease, filter 150ms ease,
+              transform 120ms var(--ease-out);
+}
+.link { transition: text-decoration-color 150ms ease; }
+.tabela tbody tr { transition: background-color 150ms ease; }
+.btn:active, .filtro:active, .btn-icone:active, .nav-item:active { transform: scale(0.97); }
+
+@keyframes entrar {
+  from { opacity: 0; transform: translateY(6px); }
+}
+.conteudo > * { animation: entrar 220ms var(--ease-out) both; }
+.conteudo > :nth-child(2) { animation-delay: 40ms; }
+.conteudo > :nth-child(3) { animation-delay: 80ms; }
+.conteudo > :nth-child(n + 4) { animation-delay: 120ms; }
+
+.sucesso, .erro[role='alert'], .alerta, .heranca { transition: opacity 150ms ease; }
+@starting-style {
+  .sucesso, .erro[role='alert'], .alerta, .heranca { opacity: 0; }
+}
+
 /* Telas estreitas: sidebar vira barra no topo */
 @media (max-width: 860px) {
   .app { grid-template-columns: minmax(0, 1fr); }
@@ -289,6 +332,13 @@ legend { font-weight: 600; padding: 0 0.25rem; }
   .marca { width: 100%; }
 }
 
+/* Reduzir movimento: mantém só os fades, tira deslocamentos */
+@keyframes surgir {
+  from { opacity: 0; }
+}
 @media (prefers-reduced-motion: reduce) {
   .barra span { transition: none; }
+  .conteudo > * { animation-name: surgir; }
+  .lancamento-form { transition: opacity 200ms ease; }
+  .btn:active, .filtro:active, .btn-icone:active, .nav-item:active { transform: none; }
 }

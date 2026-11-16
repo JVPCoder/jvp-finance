@@ -38,7 +38,7 @@ export default function Gamificacao({ meses }) {
           <>
             <p className="conquista-valor num">{brl(divida.restante)}</p>
             <div className="barra barra-divida" aria-hidden="true">
-              <span style={{ width: `${pctPago}%` }} />
+              <span style={{ '--pct': pctPago }} />
             </div>
             <p className="conquista-texto num">
               {pctPago}% pago · {divida.parcelasRestantes === 0

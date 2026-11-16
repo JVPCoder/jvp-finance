@@ -75,7 +75,7 @@ export default function Dashboard({
                     {brl(t.gasto)} <span>de {brl(t.orcamento)}</span>
                   </p>
                   <div className="barra" aria-hidden="true">
-                    <span style={{ width: `${pct}%` }} />
+                    <span style={{ '--pct': pct }} />
                   </div>
                   <p className="pote-saldo num">{textoSaldo(p.id, t.saldo)}</p>
                 </li>
