@@ -1,5 +1,5 @@
 import { PencilSimpleIcon, TrashIcon, WalletIcon } from '@phosphor-icons/react';
-import { POTES, resumoMes, totaisPorPote, saldoMes } from '../meses';
+import { POTES, ehClt, resumoMes, totaisPorPote, saldoMes } from '../meses';
 import { brl, nomeMes } from '../formato';
 import Quebra from './Quebra';
 import Lancamentos from './Lancamentos';
@@ -65,10 +65,14 @@ export default function Dashboard({
         <section className="painel" aria-labelledby="renda-titulo">
           <h2 id="renda-titulo">Renda</h2>
           <p className="destaque num">{brl(r.liquido)}</p>
-          <p className="legenda">
-            líquido · {params.diasUteis} dias × {params.horasDia}h × {brl(params.valorHora)} = {brl(r.bruto)} bruto
-          </p>
-          <Quebra resumo={r} />
+          {ehClt(params) ? <p className="legenda">líquido · salário CLT</p> : (
+            <>
+              <p className="legenda">
+                líquido · {params.diasUteis} dias × {params.horasDia}h × {brl(params.valorHora)} = {brl(r.bruto)} bruto
+              </p>
+              <Quebra resumo={r} />
+            </>
+          )}
         </section>
 
         <section className="painel" aria-labelledby="potes-titulo">

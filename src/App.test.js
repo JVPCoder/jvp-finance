@@ -34,6 +34,19 @@ test('criar o primeiro mês mostra o líquido no dashboard e persiste', () => {
   expect(screen.getByRole('heading', { level: 1, name: /dezembro de 2026/i })).toBeInTheDocument();
 });
 
+test('criar mês CLT usa o salário digitado como líquido', () => {
+  render(<App />);
+  userEvent.click(screen.getByRole('button', { name: /criar primeiro mês/i }));
+  fireEvent.change(screen.getByLabelText(/^mês$/i), { target: { value: '2026-12' } });
+  userEvent.selectOptions(screen.getByLabelText(/regime/i), 'clt');
+  expect(screen.queryByLabelText(/pró-labore/i)).not.toBeInTheDocument();
+  preencher(/salário/i, '4000');
+  userEvent.click(screen.getByRole('button', { name: /criar mês/i }));
+
+  expect(screen.getByRole('heading', { level: 1, name: /dezembro de 2026/i })).toBeInTheDocument();
+  expect(screen.getAllByText('R$ 4.000,00').length).toBeGreaterThan(0);
+});
+
 function comMes() {
   localStorage.setItem(CHAVE, JSON.stringify({
     version: 1,

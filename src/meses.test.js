@@ -133,3 +133,9 @@ test('saldoMes desconta todos os lançamentos do líquido e separa o crédito', 
   expect(s.saldo).toBeCloseTo(5787.8 - 1800, 2);
   expect(saldoMes(mesCom(6000, 0)).saldo).toBeLessThan(0);
 });
+
+test('resumoMes no CLT usa o salário como líquido', () => {
+  const r = resumoMes(novoMes({ regime: 'clt', salario: 4000, pct: { essenciais: 50, desejos: 20, investimentos: 30 } }));
+  expect(r.liquido).toBe(4000);
+  expect(r.orcamentos.investimentos).toBe(1200);
+});

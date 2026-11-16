@@ -32,9 +32,13 @@ export const herdarLancamentos = (anterior) =>
 
 export const mesAnterior = (meses, chave) => Object.keys(meses).filter((k) => k < chave).sort().pop();
 
+// CLT: salário já é o líquido. PJ (ou mês antigo sem regime): calcula pela cooperativa.
+export const ehClt = (params) => params.regime === 'clt';
+
 export function resumoMes({ params }) {
-  const bruto = calcularBruto(params);
-  const r = calcularRemuneracao({ bruto, proLabore: params.proLabore, dependentes: params.dependentes, quotas: params.quotas });
+  const r = ehClt(params)
+    ? { liquido: params.salario }
+    : calcularRemuneracao({ bruto: calcularBruto(params), proLabore: params.proLabore, dependentes: params.dependentes, quotas: params.quotas });
   const orcamentos = Object.fromEntries(POTES.map((p) => [p.id, (r.liquido * params.pct[p.id]) / 100]));
   return { ...r, orcamentos };
 }
