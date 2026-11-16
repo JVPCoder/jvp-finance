@@ -1,4 +1,4 @@
-import { novoMes, resumoMes, ultimoMes, proximaChave, totaisPorPote, salvarLancamento, removerLancamento, categoriasUsadas, herdarLancamentos, mesAnterior, streak, dividaCartao } from './meses';
+import { novoMes, resumoMes, ultimoMes, proximaChave, totaisPorPote, salvarLancamento, removerLancamento, categoriasUsadas, herdarLancamentos, mesAnterior, streak, dividaCartao, saldoMes } from './meses';
 
 const params = { diasUteis: 20, valorHora: 40, horasDia: 8, proLabore: 1621, dependentes: 0, quotas: 0,
                  pct: { essenciais: 50, desejos: 20, investimentos: 30 } };
@@ -124,4 +124,12 @@ test('dividaCartao soma parcelas restantes no crédito do mês mais recente', ()
   expect(d.restante).toBeCloseTo(2473.38, 2);
   expect(d.pago).toBeCloseTo(353.34 * 3 + 800, 2);
   expect(dividaCartao({ '2026-12': mesCom(0, 0) })).toBeNull();
+});
+
+test('saldoMes desconta todos os lançamentos do líquido e separa o crédito', () => {
+  const s = saldoMes(mesCom(1000, 500, [{ ...l('c', 'essenciais', 300), metodo: 'Crédito' }]));
+  expect(s.gasto).toBe(1800);
+  expect(s.credito).toBe(300);
+  expect(s.saldo).toBeCloseTo(5787.8 - 1800, 2);
+  expect(saldoMes(mesCom(6000, 0)).saldo).toBeLessThan(0);
 });

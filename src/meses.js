@@ -105,3 +105,11 @@ export function dividaCartao(meses) {
     { pago: 0, restante: 0, parcelasRestantes: 0 },
   );
 }
+
+// quanto do líquido ainda sobra depois de tudo que foi lançado no mês (crédito incluso)
+export function saldoMes(mes) {
+  const { liquido } = resumoMes(mes);
+  const soma = (ls) => ls.reduce((s, l) => s + l.valor, 0);
+  const gasto = soma(mes.lancamentos);
+  return { liquido, gasto, credito: soma(mes.lancamentos.filter((l) => l.metodo === 'Crédito')), saldo: liquido - gasto };
+}

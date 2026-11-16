@@ -1,5 +1,5 @@
-import { PencilSimpleIcon, TrashIcon } from '@phosphor-icons/react';
-import { POTES, resumoMes, totaisPorPote } from '../meses';
+import { PencilSimpleIcon, TrashIcon, WalletIcon } from '@phosphor-icons/react';
+import { POTES, resumoMes, totaisPorPote, saldoMes } from '../meses';
 import { brl, nomeMes } from '../formato';
 import Quebra from './Quebra';
 import Lancamentos from './Lancamentos';
@@ -25,6 +25,7 @@ export default function Dashboard({
 
   const r = resumoMes(mes);
   const totais = totaisPorPote(mes);
+  const saldo = saldoMes(mes);
   const { params } = mes;
 
   return (
@@ -45,6 +46,18 @@ export default function Dashboard({
           </button>
         </div>
       </header>
+
+      <section className={`painel saldo-mes${saldo.saldo < 0 ? ' estourou' : ''}`} aria-labelledby="saldo-titulo">
+        <div className="conquista-topo">
+          <WalletIcon size={20} aria-hidden="true" />
+          <h2 id="saldo-titulo">{saldo.saldo >= 0 ? 'Ainda posso gastar' : 'Passei da renda'}</h2>
+        </div>
+        <p className="destaque num">{brl(Math.abs(saldo.saldo))}</p>
+        <p className="conquista-texto num">
+          {brl(saldo.gasto)} lançados de {brl(saldo.liquido)} líquido · {brl(saldo.credito)} no crédito
+          {totais.investimentos.saldo > 0 && ` · ${brl(totais.investimentos.saldo)} ainda reservados para investir`}
+        </p>
+      </section>
 
       <Gamificacao meses={meses} />
 

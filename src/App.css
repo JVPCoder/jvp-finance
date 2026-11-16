@@ -141,6 +141,12 @@ h2 { font-size: 1rem; font-weight: 600; }
 .pote.estourou .barra span { background: var(--negativo); }
 .pote.estourou .pote-saldo { color: var(--negativo); font-weight: 600; }
 
+/* Saldo do mês */
+.saldo-mes { margin-bottom: 1.25rem; }
+.saldo-mes .destaque { margin-top: 0.25rem; }
+.saldo-mes.estourou .destaque, .saldo-mes.estourou .conquista-topo { color: var(--negativo); }
+.saldo-mes.estourou .conquista-topo h2 { color: inherit; }
+
 /* Gamificação */
 .gamificacao { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.25rem; margin-bottom: 1.25rem; }
 .conquista { --cor-pote: var(--destaque); padding: 1rem 1.5rem; }
