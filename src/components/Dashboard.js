@@ -47,19 +47,28 @@ export default function Dashboard({
         </div>
       </header>
 
-      <section className={`painel saldo-mes${saldo.saldo < 0 ? ' estourou' : ''}`} aria-labelledby="saldo-titulo">
-        <div className="conquista-topo">
-          <WalletIcon size={20} aria-hidden="true" />
-          <h2 id="saldo-titulo">{saldo.saldo >= 0 ? 'Ainda posso gastar' : 'Passei da renda'}</h2>
-        </div>
-        <p className="destaque num">{brl(Math.abs(saldo.saldo))}</p>
-        <p className="conquista-texto num">
-          {brl(saldo.gasto)} lançados de {brl(saldo.liquido)} líquido · {brl(saldo.credito)} no crédito
-          {totais.investimentos.saldo > 0 && ` · ${brl(totais.investimentos.saldo)} ainda reservados para investir`}
-        </p>
-      </section>
+      <div className="topo-grid">
+        <section className={`painel saldo-mes${saldo.saldo < 0 ? ' estourou' : ''}`} aria-labelledby="saldo-titulo">
+          <div className="conquista-topo">
+            <WalletIcon size={20} aria-hidden="true" />
+            <h2 id="saldo-titulo">{saldo.saldo >= 0 ? 'Ainda posso gastar' : 'Passei da renda'}</h2>
+          </div>
+          <p className="destaque num">{brl(Math.abs(saldo.saldo))}</p>
+          {/* quanto cada pote já levou do líquido; o resto da trilha é o que sobra */}
+          <div className="composicao" aria-hidden="true">
+            {POTES.filter((p) => totais[p.id].gasto > 0).map((p) => (
+              <span key={p.id} className={`pote-${p.id}`}
+                    style={{ flexBasis: `${(totais[p.id].gasto / Math.max(saldo.liquido, saldo.gasto, 1)) * 100}%` }} />
+            ))}
+          </div>
+          <p className="conquista-texto num">
+            {brl(saldo.gasto)} lançados de {brl(saldo.liquido)} líquido · {brl(saldo.credito)} no crédito
+            {totais.investimentos.saldo > 0 && ` · ${brl(totais.investimentos.saldo)} ainda reservados para investir`}
+          </p>
+        </section>
 
-      <Gamificacao meses={meses} />
+        <Gamificacao meses={meses} />
+      </div>
 
       <div className="dashboard-grid">
         <section className="painel" aria-labelledby="renda-titulo">
