@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, within } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import App from './App';
 import { CHAVE } from './storage';
@@ -154,6 +154,26 @@ test('editar parâmetros recalcula o líquido e mantém os lançamentos', () => 
 
   expect(screen.getAllByText('R$ 6.399,00').length).toBeGreaterThan(0);
   expect(screen.getByRole('cell', { name: /academia/i })).toBeInTheDocument();
+});
+
+test('o vidro do pote enche com o que foi lançado nele', async () => {
+  comMes();
+  const vidro = () => screen.getByRole('meter', { name: /^essenciais/i });
+  const superficie = () => vidro().querySelector('.slosh-gauge__liquid').style.clipPath; // topo do líquido = 100% - nível
+  expect(vidro()).toHaveAttribute('aria-valuenow', '0');
+
+  lancar('Academia', '150'); // 150 de 2.893,90 = 5%
+  expect(vidro()).toHaveAttribute('aria-valuenow', '5');
+  await waitFor(() => expect(superficie()).toContain('calc(95% + 0px)'), { timeout: 4000 });
+
+  const cartao = screen.getByRole('region', { name: /ainda posso gastar/i });
+  expect(cartao).toHaveAttribute('data-nivel', 'tranquilo');
+
+  lancar('Aluguel', '4000'); // passa do orçamento: o vidro para em 100%
+  expect(vidro()).toHaveAttribute('aria-valuenow', '100');
+  await waitFor(() => expect(superficie()).toContain('calc(0% + 0px)'), { timeout: 4000 });
+  expect(cartao).toHaveAttribute('data-nivel', 'atencao'); // 4.150 de 5.787,80 = 72% do líquido
+  expect(within(cartao).getByText('72% usado')).toBeInTheDocument();
 });
 
 test('excluir mês pede confirmação', () => {

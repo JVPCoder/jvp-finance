@@ -18,11 +18,15 @@
   --investimentos: #2c7a52;
   --vidro: #e4ddcf;
 
-  --cartaz: #1f4a36;          /* card de saldo */
+  --cartaz: #1f4a36;          /* card de saldo, até 50% do líquido usado */
+  --cartaz-atencao: #5c5418;  /* 50–75% */
+  --cartaz-alerta: #85441c;   /* 75–90% */
+  --cartaz-limite: #7f2c22;   /* 90–100% */
+  --cartaz-estourou: #5e1c1b; /* passou da renda */
   --cartaz-texto: #f4efe3;
   --cartaz-texto-2: #b9c7ba;
   --cartaz-trilha: rgb(255 255 255 / 0.12);
-  --cartaz-negativo: #ffb09c;
+  --cartaz-negativo: #ffc2b3;
 
   --display: 'Bricolage Grotesque Variable', 'Geist Variable', system-ui, sans-serif;
   --raio: 14px;
@@ -50,6 +54,10 @@
     --investimentos: #86cfa2;
     --vidro: #252c25;
     --cartaz: #183b2a;
+    --cartaz-atencao: #474114;
+    --cartaz-alerta: #683516;
+    --cartaz-limite: #62231b;
+    --cartaz-estourou: #4a1716;
     --sombra: none;
     color-scheme: dark;
   }
@@ -142,6 +150,20 @@ h2 { font-size: 1rem; font-weight: 600; letter-spacing: -0.01em; }
   display: flex;
   flex-direction: column;
   padding: 1.5rem 1.75rem;
+  transition: background-color 600ms ease;
+}
+.saldo-mes[data-nivel='atencao'] { background: var(--cartaz-atencao); }
+.saldo-mes[data-nivel='alerta'] { background: var(--cartaz-alerta); }
+.saldo-mes[data-nivel='limite'] { background: var(--cartaz-limite); }
+.saldo-mes[data-nivel='estourou'] { background: var(--cartaz-estourou); }
+.saldo-uso {
+  margin-left: auto;
+  padding: 0.125rem 0.625rem;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.12);
+  color: var(--cartaz-texto);
+  font-size: 0.8125rem;
+  font-weight: 600;
 }
 .saldo-mes::before {
   content: '';
@@ -157,7 +179,7 @@ h2 { font-size: 1rem; font-weight: 600; letter-spacing: -0.01em; }
 .saldo-mes .conquista-topo svg { color: var(--cartaz-texto); }
 .saldo-mes .destaque { font-size: clamp(3rem, 5.6vw, 4.75rem); font-weight: 700; margin: auto 0; padding: 1.25rem 0 1.75rem; letter-spacing: -0.05em; }
 .saldo-mes .conquista-texto { white-space: normal; margin: 0; }
-.saldo-mes.estourou .destaque, .saldo-mes.estourou .conquista-topo svg, .saldo-mes.estourou .conquista-topo h2 { color: var(--cartaz-negativo); }
+.saldo-mes[data-nivel='estourou'] .conquista-topo h2 { color: var(--cartaz-negativo); }
 
 .composicao { display: flex; gap: 3px; height: 10px; border-radius: 5px; overflow: hidden; background: var(--cartaz-trilha); margin-bottom: 0.875rem; }
 .composicao span { flex: 0 0 auto; background: var(--cor-pote); border-radius: 2px; }

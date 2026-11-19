@@ -1,5 +1,5 @@
 import { PencilSimpleIcon, TrashIcon, WalletIcon } from '@phosphor-icons/react';
-import { POTES, ehClt, resumoMes, totaisPorPote, saldoMes } from '../meses';
+import { POTES, ehClt, nivelGasto, resumoMes, totaisPorPote, saldoMes } from '../meses';
 import { brl, nomeMes } from '../formato';
 import Quebra from './Quebra';
 import Lancamentos from './Lancamentos';
@@ -30,6 +30,7 @@ export default function Dashboard({
   const r = resumoMes(mes);
   const totais = totaisPorPote(mes);
   const saldo = saldoMes(mes);
+  const uso = nivelGasto(saldo);
   const { params } = mes;
 
   return (
@@ -52,10 +53,12 @@ export default function Dashboard({
       </header>
 
       <div className="topo-grid">
-        <section className={`painel saldo-mes${saldo.saldo < 0 ? ' estourou' : ''}`} aria-labelledby="saldo-titulo">
+        {/* a cor do card segue a faixa do quanto do líquido já foi lançado (nivelGasto) */}
+        <section className="painel saldo-mes" data-nivel={uso.nivel} aria-labelledby="saldo-titulo">
           <div className="conquista-topo">
             <WalletIcon size={20} aria-hidden="true" />
             <h2 id="saldo-titulo">{saldo.saldo >= 0 ? 'Ainda posso gastar' : 'Passei da renda'}</h2>
+            <span className="saldo-uso num">{Math.round(uso.pct)}% usado</span>
           </div>
           {/* odômetro: os dígitos rolam quando um lançamento muda o saldo */}
           <p className="destaque num">
