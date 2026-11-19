@@ -209,8 +209,21 @@ h2 { font-size: 1rem; font-weight: 600; letter-spacing: -0.01em; }
   color: var(--texto-2);
   box-shadow: inset 0 0 0 1.5px var(--borda-forte), inset 0 6px 10px -6px rgb(0 0 0 / 0.12);
 }
+/* brilho do vidro: uma faixa clara fixa na lateral, por cima do líquido. Não se mexe. */
+.pote .slosh-gauge::after {
+  content: '';
+  position: absolute;
+  top: 10px;
+  bottom: 10px;
+  left: 9px;
+  width: 5px;
+  border-radius: 3px;
+  background: linear-gradient(to bottom, rgb(255 255 255 / 0.55), rgb(255 255 255 / 0.1) 70%, transparent);
+  pointer-events: none;
+}
 @media (prefers-color-scheme: dark) {
   .pote .slosh-gauge { --sg-on-liquid: #10180f !important; }
+  .pote .slosh-gauge::after { opacity: 0.45; }
 }
 .pote-cabecalho { display: flex; justify-content: space-between; align-items: baseline; gap: 0.5rem; }
 .pote-nome { font-weight: 600; display: inline-flex; align-items: center; gap: 0.5rem; }

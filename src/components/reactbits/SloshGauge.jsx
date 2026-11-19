@@ -38,7 +38,9 @@ export default function SloshGauge({
   splash = 0.42,
   unit = '%',
   ariaLabel = 'Level',
-  className = ''
+  className = '',
+  intro = false, // jvp: ao montar, o líquido sobe do fundo até o nível (a mola do próprio componente faz o resto)
+  introDelay = 0 // jvp: ms antes de começar, para encher os vidros um depois do outro
 }) {
   const root = useRef(null);
   const liquid = useRef(null);
@@ -140,9 +142,20 @@ export default function SloshGauge({
     sync();
     mq.addEventListener('change', sync);
     say();
-    paint();
     const s = sim.current;
+    let introTimer;
+    if (intro && !mq.matches && s.L > 0) {
+      // o efeito de [value] já agendou um frame parado no nível; troca por um enchimento que parte do zero
+      cancelAnimationFrame(s.raf);
+      s.raf = 0;
+      s.last = 0;
+      s.x = 0;
+      s.v = 0;
+      introTimer = setTimeout(wake, introDelay);
+    }
+    paint();
     return () => {
+      clearTimeout(introTimer);
       mq.removeEventListener('change', sync);
       cancelAnimationFrame(s.raf);
     };

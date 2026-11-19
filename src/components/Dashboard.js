@@ -97,7 +97,7 @@ export default function Dashboard({
         <section className="painel" aria-labelledby="potes-titulo">
           <h2 id="potes-titulo">Potes</h2>
           <ul className="potes">
-            {POTES.map((p) => {
+            {POTES.map((p, i) => {
               const t = totais[p.id];
               const pct = t.orcamento > 0 ? Math.min((t.gasto / t.orcamento) * 100, 100) : 0;
               const estourou = p.id !== 'investimentos' && t.saldo < 0;
@@ -110,6 +110,8 @@ export default function Dashboard({
                     height={128}
                     radius={16}
                     ticks={4}
+                    intro
+                    introDelay={120 + i * 70}
                     glassColor="var(--vidro)"
                     ariaLabel={`${p.nome}: ${Math.round(pct)}% ${p.id === 'investimentos' ? 'da meta' : 'do orçamento'}`}
                   />

@@ -176,6 +176,23 @@ test('o vidro do pote enche com o que foi lançado nele', async () => {
   expect(within(cartao).getByText('72% usado')).toBeInTheDocument();
 });
 
+test('ao abrir o dashboard o vidro começa vazio e enche até o nível', async () => {
+  localStorage.setItem(CHAVE, JSON.stringify({
+    version: 1,
+    meses: { '2026-12': { params: { diasUteis: 20, valorHora: 40, horasDia: 8, proLabore: 1621, dependentes: 0, quotas: 0,
+                                    pct: { essenciais: 50, desejos: 20, investimentos: 30 } },
+                          lancamentos: [{ id: 'a', pote: 'essenciais', origem: 'Academia', data: '2026-12-02', metodo: 'Pix',
+                                          categoria: '', valor: 150, tipo: 'avulso' }] } },
+  }));
+  render(<App />);
+  const vidro = screen.getByRole('meter', { name: /^essenciais/i });
+  const superficie = () => vidro.querySelector('.slosh-gauge__liquid').style.clipPath;
+
+  expect(vidro).toHaveAttribute('aria-valuenow', '5'); // o leitor de tela já recebe o valor final
+  expect(superficie()).toContain('calc(100% + 0px)'); // vazio
+  await waitFor(() => expect(superficie()).toContain('calc(95% + 0px)'), { timeout: 4000 });
+});
+
 test('excluir mês pede confirmação', () => {
   comMes();
 
