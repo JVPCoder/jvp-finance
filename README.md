@@ -57,7 +57,7 @@ As regras de negócio ficam em funções puras, testadas sem React. Os component
 
 ## Stack
 
-React 19 com Create React App, CSS puro com modo escuro automático, ícones [Phosphor](https://phosphoricons.com/) e testes com Jest e Testing Library.
+React 19 com Create React App, CSS puro com modo escuro automático, fontes Bricolage Grotesque e Geist (locais, via Fontsource), ícones [Phosphor](https://phosphoricons.com/) e testes com Jest e Testing Library. Dois componentes do [React Bits](https://reactbits.dev) em `src/components/reactbits/` (Counter no saldo, SloshGauge nos potes; licença MIT + Commons Clause) e o AlertDialog do Radix (a base do shadcn/ui) nas confirmações.
 
 ## Dados e privacidade
 

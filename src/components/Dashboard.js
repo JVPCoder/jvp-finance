@@ -4,6 +4,10 @@ import { brl, nomeMes } from '../formato';
 import Quebra from './Quebra';
 import Lancamentos from './Lancamentos';
 import Gamificacao from './Gamificacao';
+import Counter from './reactbits/Counter';
+import SloshGauge from './reactbits/SloshGauge';
+
+const MOEDA = { style: 'currency', currency: 'BRL' };
 
 function textoSaldo(poteId, saldo) {
   if (poteId === 'investimentos') return saldo > 0 ? `Faltam ${brl(saldo)} para a meta` : 'Meta batida';
@@ -53,7 +57,10 @@ export default function Dashboard({
             <WalletIcon size={20} aria-hidden="true" />
             <h2 id="saldo-titulo">{saldo.saldo >= 0 ? 'Ainda posso gastar' : 'Passei da renda'}</h2>
           </div>
-          <p className="destaque num">{brl(Math.abs(saldo.saldo))}</p>
+          {/* odômetro: os dígitos rolam quando um lançamento muda o saldo */}
+          <p className="destaque num">
+            <Counter value={Math.abs(saldo.saldo)} locale="pt-BR" format={MOEDA} fontSize="inherit" motionBlur={false} />
+          </p>
           {/* quanto cada pote já levou do líquido; o resto da trilha é o que sobra */}
           <div className="composicao" aria-hidden="true">
             {POTES.filter((p) => totais[p.id].gasto > 0).map((p) => (
@@ -93,17 +100,26 @@ export default function Dashboard({
               const estourou = p.id !== 'investimentos' && t.saldo < 0;
               return (
                 <li key={p.id} className={`pote pote-${p.id}${estourou ? ' estourou' : ''}`}>
-                  <div className="pote-cabecalho">
-                    <span className="pote-nome">{p.nome}</span>
-                    <span className="pote-pct">{params.pct[p.id]}%</span>
+                  {/* o pote é um vidro: o líquido sobe com o que já saiu dele (ou, em Investimentos, com o que já entrou) */}
+                  <SloshGauge
+                    value={Math.round(pct)}
+                    width={72}
+                    height={128}
+                    radius={16}
+                    ticks={4}
+                    glassColor="var(--vidro)"
+                    ariaLabel={`${p.nome}: ${Math.round(pct)}% ${p.id === 'investimentos' ? 'da meta' : 'do orçamento'}`}
+                  />
+                  <div className="pote-info">
+                    <div className="pote-cabecalho">
+                      <span className="pote-nome">{p.nome}</span>
+                      <span className="pote-pct">{params.pct[p.id]}%</span>
+                    </div>
+                    <p className="pote-uso num">
+                      {brl(t.gasto)} <span>de {brl(t.orcamento)}</span>
+                    </p>
+                    <p className="pote-saldo num">{textoSaldo(p.id, t.saldo)}</p>
                   </div>
-                  <p className="pote-uso num">
-                    {brl(t.gasto)} <span>de {brl(t.orcamento)}</span>
-                  </p>
-                  <div className="barra" aria-hidden="true">
-                    <span style={{ '--pct': pct }} />
-                  </div>
-                  <p className="pote-saldo num">{textoSaldo(p.id, t.saldo)}</p>
                 </li>
               );
             })}

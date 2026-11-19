@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import App from './App';
 import { CHAVE } from './storage';
@@ -158,15 +158,15 @@ test('editar parâmetros recalcula o líquido e mantém os lançamentos', () => 
 
 test('excluir mês pede confirmação', () => {
   comMes();
-  const confirmar = jest.spyOn(window, 'confirm').mockReturnValueOnce(false).mockReturnValueOnce(true);
 
   userEvent.click(screen.getByRole('button', { name: /excluir mês/i }));
+  userEvent.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: /cancelar/i }));
+  expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument();
   expect(screen.getByRole('heading', { level: 1, name: /dezembro de 2026/i })).toBeInTheDocument();
 
   userEvent.click(screen.getByRole('button', { name: /excluir mês/i }));
+  userEvent.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: /excluir mês/i }));
   expect(screen.getByRole('heading', { name: /nenhum mês ainda/i })).toBeInTheDocument();
-  expect(confirmar).toHaveBeenCalledTimes(2);
-  confirmar.mockRestore();
 });
 
 test('dashboard mostra sequência em andamento e dívida do cartão', () => {
@@ -189,17 +189,16 @@ test('importar backup inválido mostra erro e não mexe nos dados', async () => 
 
 test('importar backup válido substitui os dados após confirmação', async () => {
   comMes();
-  const confirmar = jest.spyOn(window, 'confirm').mockReturnValue(true);
   const backup = { version: 1, meses: { '2027-03': JSON.parse(localStorage.getItem(CHAVE)).meses['2026-12'] } };
 
   userEvent.click(screen.getByRole('button', { name: /^backup$/i }));
   userEvent.upload(screen.getByLabelText(/arquivo de backup/i), arquivo(JSON.stringify(backup)));
 
-  expect(await screen.findByText(/backup importado/i)).toBeInTheDocument();
-  expect(confirmar).toHaveBeenCalled();
+  const dialogo = await screen.findByRole('alertdialog');
+  userEvent.click(within(dialogo).getByRole('button', { name: /importar backup/i }));
+  expect(screen.getByText(/backup importado/i)).toBeInTheDocument();
   userEvent.click(screen.getByRole('button', { name: /^dashboard$/i }));
   expect(screen.getByRole('heading', { level: 1, name: /março de 2027/i })).toBeInTheDocument();
-  confirmar.mockRestore();
 });
 
 test('percentuais que não somam 100 bloqueiam o envio', () => {
