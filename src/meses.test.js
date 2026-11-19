@@ -1,4 +1,4 @@
-import { novoMes, resumoMes, ultimoMes, proximaChave, totaisPorPote, salvarLancamento, removerLancamento, categoriasUsadas, herdarLancamentos, mesAnterior, streak, dividaCartao, saldoMes } from './meses';
+import { novoMes, resumoMes, ultimoMes, proximaChave, totaisPorPote, salvarLancamento, removerLancamento, categoriasUsadas, herdarLancamentos, mesAnterior, streak, dividaCartao, saldoMes, nivelGasto } from './meses';
 
 const params = { diasUteis: 20, valorHora: 40, horasDia: 8, proLabore: 1621, dependentes: 0, quotas: 0,
                  pct: { essenciais: 50, desejos: 20, investimentos: 30 } };
@@ -138,4 +138,18 @@ test('resumoMes no CLT usa o salário como líquido', () => {
   const r = resumoMes(novoMes({ regime: 'clt', salario: 4000, pct: { essenciais: 50, desejos: 20, investimentos: 30 } }));
   expect(r.liquido).toBe(4000);
   expect(r.orcamentos.investimentos).toBe(1200);
+});
+
+test('nivelGasto separa o quanto do líquido já foi lançado em faixas', () => {
+  const nivel = (gasto, liquido = 1000) => nivelGasto({ liquido, gasto }).nivel;
+  expect(nivel(0)).toBe('tranquilo');
+  expect(nivel(499)).toBe('tranquilo');
+  expect(nivel(500)).toBe('atencao');
+  expect(nivel(750)).toBe('alerta');
+  expect(nivel(900)).toBe('limite');
+  expect(nivel(1000)).toBe('estourou');
+  expect(nivel(1500)).toBe('estourou');
+  expect(nivelGasto({ liquido: 1000, gasto: 250 }).pct).toBe(25);
+  expect(nivel(0, 0)).toBe('tranquilo'); // sem renda e sem gasto não divide por zero
+  expect(nivel(10, 0)).toBe('estourou');
 });

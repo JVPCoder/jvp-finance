@@ -27,7 +27,7 @@ function baixar(dados) {
   URL.revokeObjectURL(url);
 }
 
-export default function Backup({ dados, onImportar }) {
+export default function Backup({ dados, onImportar, onConfirmar }) {
   const [mensagem, setMensagem] = useState(null); // { tipo: 'erro' | 'ok', texto }
 
   async function aoEscolher(e) {
@@ -36,9 +36,15 @@ export default function Backup({ dados, onImportar }) {
     if (!arquivo) return;
     try {
       const novos = importar(await lerArquivo(arquivo));
-      if (!window.confirm(`Substituir os dados atuais (${resumo(dados)}) pelos do arquivo (${resumo(novos)})?`)) return;
-      onImportar(novos);
-      setMensagem({ tipo: 'ok', texto: `Backup importado: ${resumo(novos)}.` });
+      onConfirmar({
+        titulo: 'Substituir os dados atuais?',
+        texto: `Sai: ${resumo(dados)}. Entra: ${resumo(novos)}, do arquivo.`,
+        acao: 'Importar backup',
+        onConfirmar: () => {
+          onImportar(novos);
+          setMensagem({ tipo: 'ok', texto: `Backup importado: ${resumo(novos)}.` });
+        },
+      });
     } catch (erro) {
       setMensagem({ tipo: 'erro', texto: `${erro.message}. Seus dados atuais não foram alterados.` });
     }

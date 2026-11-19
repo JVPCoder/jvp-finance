@@ -10,12 +10,14 @@ import Dashboard from './components/Dashboard';
 import MesForm from './components/MesForm';
 import Meses from './components/Meses';
 import Backup from './components/Backup';
+import Confirmar from './components/Confirmar';
 
 export default function App() {
   const [dados, setDados] = useState(carregar);
   const [pagina, setPagina] = useState('dashboard');
   const [selecionado, setSelecionado] = useState(null); // null = mês mais recente
   const [erroSalvar, setErroSalvar] = useState(false);
+  const [pedido, setPedido] = useState(null); // confirmação aberta
 
   useEffect(() => {
     try {
@@ -57,13 +59,19 @@ export default function App() {
 
   function excluirMes(chave) {
     const n = dados.meses[chave].lancamentos.length;
-    const aviso = n ? ` Os ${n} lançamentos dele também serão apagados.` : '';
-    if (!window.confirm(`Excluir ${nomeMes(chave)}?${aviso}`)) return;
-    setDados((d) => {
-      const { [chave]: _removido, ...resto } = d.meses;
-      return { ...d, meses: resto };
+    setPedido({
+      titulo: `Excluir ${nomeMes(chave)}?`,
+      texto: n ? `Os ${n} lançamentos dele também serão apagados. Não dá para desfazer.` : 'Não dá para desfazer.',
+      acao: 'Excluir mês',
+      perigo: true,
+      onConfirmar: () => {
+        setDados((d) => {
+          const { [chave]: _removido, ...resto } = d.meses;
+          return { ...d, meses: resto };
+        });
+        setSelecionado(null);
+      },
     });
-    setSelecionado(null);
   }
 
   let conteudo;
@@ -102,6 +110,7 @@ export default function App() {
     conteudo = (
       <Backup
         dados={dados}
+        onConfirmar={setPedido}
         onImportar={(novos) => {
           setDados(novos);
           setSelecionado(null);
@@ -138,6 +147,7 @@ export default function App() {
         )}
         {conteudo}
       </main>
+      <Confirmar pedido={pedido} onFechar={() => setPedido(null)} />
     </div>
   );
 }

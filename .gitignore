@@ -26,3 +26,13 @@ yarn-error.log*
 # planejamento local (fora do repositório)
 /SPEC.md
 /tasks
+
+# ferramentas locais de IA (skills instaladas, perfil do Chrome das capturas)
+/.agents
+/.claude
+/.taste-skill
+/skills-lock.json
+
+# cache do eslint do CRA e pasta do editor
+.eslintcache
+.vscode/

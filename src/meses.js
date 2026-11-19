@@ -117,3 +117,11 @@ export function saldoMes(mes) {
   const gasto = soma(mes.lancamentos);
   return { liquido, gasto, credito: soma(mes.lancamentos.filter((l) => l.metodo === 'Crédito')), saldo: liquido - gasto };
 }
+
+// quanto do líquido já foi lançado, em faixas: muda a cor do card "Ainda posso gastar"
+export const FAIXAS_GASTO = [[100, 'estourou'], [90, 'limite'], [75, 'alerta'], [50, 'atencao'], [0, 'tranquilo']];
+
+export function nivelGasto({ liquido, gasto }) {
+  const pct = liquido > 0 ? (gasto / liquido) * 100 : gasto > 0 ? 100 : 0;
+  return { pct, nivel: FAIXAS_GASTO.find(([min]) => pct >= min)[1] };
+}

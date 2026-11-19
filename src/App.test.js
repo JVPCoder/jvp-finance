@@ -1,5 +1,6 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { StrictMode } from 'react';
 import App from './App';
 import { CHAVE } from './storage';
 
@@ -156,17 +157,67 @@ test('editar parâmetros recalcula o líquido e mantém os lançamentos', () => 
   expect(screen.getByRole('cell', { name: /academia/i })).toBeInTheDocument();
 });
 
+test('o vidro do pote enche com o que foi lançado nele', async () => {
+  comMes();
+  const vidro = () => screen.getByRole('meter', { name: /^essenciais/i });
+  const superficie = () => vidro().querySelector('.slosh-gauge__liquid').style.clipPath; // topo do líquido = 100% - nível
+  expect(vidro()).toHaveAttribute('aria-valuenow', '0');
+
+  lancar('Academia', '150'); // 150 de 2.893,90 = 5%
+  expect(vidro()).toHaveAttribute('aria-valuenow', '5');
+  await waitFor(() => expect(superficie()).toContain('calc(95% + 0px)'), { timeout: 4000 });
+
+  const cartao = screen.getByRole('region', { name: /ainda posso gastar/i });
+  expect(cartao).toHaveAttribute('data-nivel', 'tranquilo');
+
+  lancar('Aluguel', '4000'); // passa do orçamento: o vidro para em 100%
+  expect(vidro()).toHaveAttribute('aria-valuenow', '100');
+  await waitFor(() => expect(superficie()).toContain('calc(0% + 0px)'), { timeout: 4000 });
+  expect(cartao).toHaveAttribute('data-nivel', 'atencao'); // 4.150 de 5.787,80 = 72% do líquido
+  expect(within(cartao).getByText('72% usado')).toBeInTheDocument();
+});
+
+test('ao abrir o dashboard o vidro começa vazio e enche até o nível', async () => {
+  localStorage.setItem(CHAVE, JSON.stringify({
+    version: 1,
+    meses: { '2026-12': { params: { diasUteis: 20, valorHora: 40, horasDia: 8, proLabore: 1621, dependentes: 0, quotas: 0,
+                                    pct: { essenciais: 50, desejos: 20, investimentos: 30 } },
+                          lancamentos: [{ id: 'a', pote: 'essenciais', origem: 'Academia', data: '2026-12-02', metodo: 'Pix',
+                                          categoria: '', valor: 150, tipo: 'avulso' }] } },
+  }));
+  render(<App />);
+  const vidro = screen.getByRole('meter', { name: /^essenciais/i });
+  const superficie = () => vidro.querySelector('.slosh-gauge__liquid').style.clipPath;
+
+  expect(vidro).toHaveAttribute('aria-valuenow', '5'); // o leitor de tela já recebe o valor final
+  expect(superficie()).toContain('calc(100% + 0px)'); // vazio
+  await waitFor(() => expect(superficie()).toContain('calc(95% + 0px)'), { timeout: 4000 });
+});
+
+test('no StrictMode (npm start) o vidro também acompanha um lançamento novo', async () => {
+  localStorage.setItem(CHAVE, JSON.stringify({
+    version: 1,
+    meses: { '2026-12': { params: { diasUteis: 20, valorHora: 40, horasDia: 8, proLabore: 1621, dependentes: 0, quotas: 0,
+                                    pct: { essenciais: 50, desejos: 20, investimentos: 30 } }, lancamentos: [] } },
+  }));
+  render(<StrictMode><App /></StrictMode>);
+  const superficie = () => screen.getByRole('meter', { name: /^essenciais/i }).querySelector('.slosh-gauge__liquid').style.clipPath;
+
+  lancar('Academia', '150'); // vidro vazio → 5%
+  await waitFor(() => expect(superficie()).toContain('calc(95% + 0px)'), { timeout: 4000 });
+});
+
 test('excluir mês pede confirmação', () => {
   comMes();
-  const confirmar = jest.spyOn(window, 'confirm').mockReturnValueOnce(false).mockReturnValueOnce(true);
 
   userEvent.click(screen.getByRole('button', { name: /excluir mês/i }));
+  userEvent.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: /cancelar/i }));
+  expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument();
   expect(screen.getByRole('heading', { level: 1, name: /dezembro de 2026/i })).toBeInTheDocument();
 
   userEvent.click(screen.getByRole('button', { name: /excluir mês/i }));
+  userEvent.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: /excluir mês/i }));
   expect(screen.getByRole('heading', { name: /nenhum mês ainda/i })).toBeInTheDocument();
-  expect(confirmar).toHaveBeenCalledTimes(2);
-  confirmar.mockRestore();
 });
 
 test('dashboard mostra sequência em andamento e dívida do cartão', () => {
@@ -189,17 +240,16 @@ test('importar backup inválido mostra erro e não mexe nos dados', async () => 
 
 test('importar backup válido substitui os dados após confirmação', async () => {
   comMes();
-  const confirmar = jest.spyOn(window, 'confirm').mockReturnValue(true);
   const backup = { version: 1, meses: { '2027-03': JSON.parse(localStorage.getItem(CHAVE)).meses['2026-12'] } };
 
   userEvent.click(screen.getByRole('button', { name: /^backup$/i }));
   userEvent.upload(screen.getByLabelText(/arquivo de backup/i), arquivo(JSON.stringify(backup)));
 
-  expect(await screen.findByText(/backup importado/i)).toBeInTheDocument();
-  expect(confirmar).toHaveBeenCalled();
+  const dialogo = await screen.findByRole('alertdialog');
+  userEvent.click(within(dialogo).getByRole('button', { name: /importar backup/i }));
+  expect(screen.getByText(/backup importado/i)).toBeInTheDocument();
   userEvent.click(screen.getByRole('button', { name: /^dashboard$/i }));
   expect(screen.getByRole('heading', { level: 1, name: /março de 2027/i })).toBeInTheDocument();
-  confirmar.mockRestore();
 });
 
 test('percentuais que não somam 100 bloqueiam o envio', () => {
