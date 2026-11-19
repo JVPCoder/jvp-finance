@@ -40,7 +40,8 @@ export default function SloshGauge({
   ariaLabel = 'Level',
   className = '',
   intro = false, // jvp: ao montar, o líquido sobe do fundo até o nível (a mola do próprio componente faz o resto)
-  introDelay = 0 // jvp: ms antes de começar, para encher os vidros um depois do outro
+  introDelay = 0, // jvp: ms antes de começar, para encher os vidros um depois do outro
+  damping // jvp: razão de amortecimento da mola (0–1). Sem ela vale 0,26 − 0,17 × viscosity (~0,23: passa ~47% do alvo)
 }) {
   const root = useRef(null);
   const liquid = useRef(null);
@@ -53,7 +54,7 @@ export default function SloshGauge({
   const reduce = useRef(false);
   const [held, setHeld] = useState(false);
   const live = useRef({});
-  live.current = { viscosity, tilt, splash, width, height, value, onChange, unit };
+  live.current = { viscosity, tilt, splash, width, height, value, onChange, unit, damping };
 
   const paint = () => {
     const { x, v, L } = sim.current;
@@ -77,7 +78,7 @@ export default function SloshGauge({
 
   const tick = now => {
     const s = sim.current;
-    const { viscosity: vis, splash: give } = live.current;
+    const { viscosity: vis, splash: give, damping: amort } = live.current;
     const dt = s.last ? Math.min((now - s.last) / 1000, DT_MAX) : H;
     s.last = now;
     if (vis <= 0) {
@@ -85,7 +86,7 @@ export default function SloshGauge({
       s.v = 0;
     } else {
       const k = 1224 - 1044 * vis;
-      const zeta = reduce.current ? 1 : 0.26 - 0.17 * vis;
+      const zeta = reduce.current ? 1 : amort ?? 0.26 - 0.17 * vis;
       const c = 2 * zeta * Math.sqrt(k);
       const rest = reduce.current ? 0 : give;
       for (let n = Math.ceil(dt / H), h = dt / n; n > 0; n -= 1) {
@@ -158,6 +159,9 @@ export default function SloshGauge({
       clearTimeout(introTimer);
       mq.removeEventListener('change', sync);
       cancelAnimationFrame(s.raf);
+      // jvp: sem zerar, o wake() de depois (remontagem do StrictMode) acha que já há um frame agendado e o vidro congela
+      s.raf = 0;
+      s.last = 0;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

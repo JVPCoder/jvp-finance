@@ -112,6 +112,7 @@ export default function Dashboard({
                     ticks={4}
                     intro
                     introDelay={120 + i * 70}
+                    damping={0.7} /* ~5% de passagem: o líquido assenta sem balançar como gelatina */
                     glassColor="var(--vidro)"
                     ariaLabel={`${p.nome}: ${Math.round(pct)}% ${p.id === 'investimentos' ? 'da meta' : 'do orçamento'}`}
                   />

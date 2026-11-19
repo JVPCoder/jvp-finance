@@ -1,5 +1,6 @@
 import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { StrictMode } from 'react';
 import App from './App';
 import { CHAVE } from './storage';
 
@@ -190,6 +191,19 @@ test('ao abrir o dashboard o vidro começa vazio e enche até o nível', async (
 
   expect(vidro).toHaveAttribute('aria-valuenow', '5'); // o leitor de tela já recebe o valor final
   expect(superficie()).toContain('calc(100% + 0px)'); // vazio
+  await waitFor(() => expect(superficie()).toContain('calc(95% + 0px)'), { timeout: 4000 });
+});
+
+test('no StrictMode (npm start) o vidro também acompanha um lançamento novo', async () => {
+  localStorage.setItem(CHAVE, JSON.stringify({
+    version: 1,
+    meses: { '2026-12': { params: { diasUteis: 20, valorHora: 40, horasDia: 8, proLabore: 1621, dependentes: 0, quotas: 0,
+                                    pct: { essenciais: 50, desejos: 20, investimentos: 30 } }, lancamentos: [] } },
+  }));
+  render(<StrictMode><App /></StrictMode>);
+  const superficie = () => screen.getByRole('meter', { name: /^essenciais/i }).querySelector('.slosh-gauge__liquid').style.clipPath;
+
+  lancar('Academia', '150'); // vidro vazio → 5%
   await waitFor(() => expect(superficie()).toContain('calc(95% + 0px)'), { timeout: 4000 });
 });
 
